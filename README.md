@@ -8,7 +8,7 @@ data serialization format; see [binson.org](http://binson.org/).
 Usage
 =====
 
-Just include the binson.js in your project. It has no dependencies.
+Just include binson.js in your project. It has no dependencies.
 
 
 Status
@@ -21,17 +21,32 @@ the Binson types: string, bytes, object.
 For binson-js developers
 ========================
 
-View binson-test.html in your browser to run the tests. Enable the 
+View [binson-test.html](binson-test.html) in your browser to run the tests. Enable the 
 web console to see the output.
 
-Repo
-----
+Requirements
+------------
 
-To clone the repository at Github:
+* Readable code.
+* Extensive unit test suit.
+* Must work on recent Firefox and Chrome browsers.
+* Should work on most smart phone browsers.
+* Should work on most tablet computers.
+
+
+GIT Repo
+--------
+
+To clone:
 
     git clone https://github.com/assaabloy-ppi/binson-js.git
 
-Other useful GIT commands:
+Other useful commands:
 
-    git status     // view status of local repo
+    git pull                // get updates from Github to local repo
+    git status              // status of local repo
+    git add README.txt      // adds README.txt to index
+    git commit -m "updated README with some important info"
+    git push
+
 
