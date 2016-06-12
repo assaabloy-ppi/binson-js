@@ -21,7 +21,7 @@ the Binson types: string, bytes, object.
 For binson-js developers
 ========================
 
-View [binson-test.html](binson-test.html) in your browser to run the tests. Enable the 
+View binson-test.html in your browser to run the tests. Enable the 
 web console to see the output.
 
 Requirements
