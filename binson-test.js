@@ -30,6 +30,8 @@ function runBinsonTests() {
         {name: "b.testNested", f:b.testNested},
         {name: "b.test1", f:b.test1},
         {name: "b.testTwoFields", f:b.testTwoFields},
+        {name: "b.testBooleanTrue", f:b.testBooleanTrue},
+        {name: "b.testBooleanFalse", f:b.testBooleanFalse},
         
         {name: "p.test1", f:p.test1},
         {name: "p.test1WithParseFunction", f:p.test1WithParseFunction},
@@ -98,6 +100,40 @@ function BinsonTest() {
             }
         }
     };
+    
+    this.testBooleanTrue = function() {
+
+        var b = new Binson().putBoolean("aaaa", true);
+        var expected = [64, 20, 4, 97, 97, 97, 97, 68, 65];
+        var bytes = b.toBytes();
+        var uints = new Uint8Array(bytes);
+        for (var i = 0; i < expected.length; i++) {
+            if (uints[i] != expected[i]) {
+                console.log("uints: " + uints + ", " + uints.length);
+                console.log("expected: " + expected);
+                
+                throw new Error("testBooleanTrue - ERROR; i=" + i + ", " + uints[i] + ", " + expected[i]);
+                break;
+            }
+        }
+    }
+    
+    this.testBooleanFalse = function() {
+
+        var b = new Binson().putBoolean("aaaa", false);
+        var expected = [64, 20, 4, 97, 97, 97, 97, 69, 65];
+        var bytes = b.toBytes();
+        var uints = new Uint8Array(bytes);
+        for (var i = 0; i < expected.length; i++) {
+            if (uints[i] != expected[i]) {
+                console.log("uints: " + uints + ", " + uints.length);
+                console.log("expected: " + expected);
+                
+                throw new Error("testBooleanTrue - ERROR; i=" + i + ", " + uints[i] + ", " + expected[i]);
+                break;
+            }
+        }
+    }
     
     // Sanity check
     this.test1 = function() {
@@ -241,7 +277,9 @@ function BinsonParserTest() {
         
         // {ek=0x111...;}   32-long byte array ("ek").       
         var data = [
-            0x40, 0x14, 0x02, 0x65, 0x6b, 0x18, 0x20, 0xde, 0x52, 0xa1, 0xb7, 0xf1, 0xb6, 0x7e, 0xb4, 0x61, 0x28, 0x53, 0xcc, 0xfb, 0xbc, 0x72, 0xc3, 0xec, 0x54, 0xa8, 0x80, 0x77, 0xd9, 0x2c, 0x74, 0xfd, 0xf8, 0xab, 0x7b, 0x6c, 0x6c, 0x64, 0x38, 0x41
+            0x40, 0x14, 0x02, 0x65, 0x6b, 0x18, 0x20, 0xde, 0x52, 0xa1, 0xb7, 0xf1, 0xb6, 
+            0x7e, 0xb4, 0x61, 0x28, 0x53, 0xcc, 0xfb, 0xbc, 0x72, 0xc3, 0xec, 0x54, 0xa8, 
+            0x80, 0x77, 0xd9, 0x2c, 0x74, 0xfd, 0xf8, 0xab, 0x7b, 0x6c, 0x6c, 0x64, 0x38, 0x41
         ];
         
         for (var i = 0; i < data.length; i++) {

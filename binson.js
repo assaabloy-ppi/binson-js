@@ -51,6 +51,12 @@ function Binson() {
         return this;
     };
     
+    this.putBoolean = function(name, value) {
+        // TODO?
+        this.put("boolean", name, value);
+        return this;
+    }
+    
     this.put = function(type, name, value) {
         this.fields[name] = {type:type, value:value};
         return this;
@@ -132,11 +138,26 @@ function Binson() {
             case 'object':
                 offset = this.pObjectToBytes(bytes, offset, value.value);   
                 break;
+            case 'boolean':
+                offset = this.pBooleanToBytes(bytes, offset, value.value);
             // TODO more cases
         }
         
         return offset;
     };
+    
+    this.pBooleanToBytes = function(bytes, offset, bool) {
+
+        if (bool) {
+            bytes.setUint8(offset, 0x44);
+            offset += 1;
+        } else {
+            bytes.setUint8(offset, 0x45);
+            offset += 1;
+        }
+        
+        return offset;
+    }
     
     this.pObjectToBytes = function(bytes, offset, obj) {
         if (bytes.byteLength < 2) {
@@ -267,6 +288,9 @@ function Binson() {
                 break;
             case "object":
                 size += this.pObjectSize(value.value);
+                break;
+            case "boolean":
+                size += 1;
                 break;
             // TODO more cases
         }
