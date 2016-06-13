@@ -32,6 +32,10 @@ function runBinsonTests() {
         {name: "b.testTwoFields", f:b.testTwoFields},
         {name: "b.testBooleanTrue", f:b.testBooleanTrue},
         {name: "b.testBooleanFalse", f:b.testBooleanFalse},
+        /*{name: "b.testInt8", f:b.testInt8},
+        {name: "b.testInt16", f:b.testInt16},
+        {name: "b.testInt32", f:b.testInt32},
+        {name: "b.testInt64", f:b.testInt64},*/
         
         {name: "p.test1", f:p.test1},
         {name: "p.test1WithParseFunction", f:p.test1WithParseFunction},
@@ -40,7 +44,9 @@ function runBinsonTests() {
         {name: "p.testNested", f:p.testNested},
         {name: "p.testBytes", f:p.testBytes},
         {name: "p.testParseBytes", f:p.testParseBytes},
-        {name: "p.testLargeByteArray", f:p.testLargeByteArray}
+        {name: "p.testLargeByteArray", f:p.testLargeByteArray},
+        {name: "p.testBoolean", f:p.testBoolean},
+        {name: "p.testMixed", f:p.testMixed}
     ];
     
     for (var i = 0; i < testSuit.length; i++) {
@@ -50,6 +56,16 @@ function runBinsonTests() {
             console.log("OK " + test.name);
         } catch (ex) {
             console.error("ERROR " + test.name + ", " + ex);
+        }
+    }
+}
+
+function checkEquality(bytes, expected) {
+    for (var i = 0; i < expected.length; i++) {
+        if ( bytes[i] != expected[i]) {
+            throw new Error("at index: " + i + "\n\t"
+                + "Expected: " + expected[i] + "\n\t"
+                + "Value: " + bytes[i]);
         }
     }
 }
@@ -65,16 +81,7 @@ function BinsonTest() {
         var bytes = b.toBytes();
         var uints = new Uint8Array(bytes);
         
-        for (var i = 0; i < expected.length; i++) {
-            if (uints[i] != expected[i]) {
-                
-                console.log("uints: " + uints + ", " + uints.length);
-                console.log("expected: " + expected);
-                
-                throw new Error("testBytes - ERROR, i=" + i + ", " + uints[i] + ", " + expected[i]);
-                break;
-            }
-        }
+        checkEquality(uints, expected);
     };
     
     this.testBytes2 = function() {
@@ -89,77 +96,80 @@ function BinsonTest() {
         var bytes = b.toBytes();
         var uints = new Uint8Array(bytes);
         
-        for (var i = 0; i < expected.length; i++) {
-            if (uints[i] != expected[i]) {
-                
-                console.log("uints: " + uints + ", " + uints.length);
-                console.log("expected: " + expected);
-                
-                throw new Error("testBytes - ERROR, i=" + i + ", " + uints[i] + ", " + expected[i]);
-                break;
-            }
-        }
+        checkEquality(uints, expected);
     };
     
     this.testBooleanTrue = function() {
-
-        var b = new Binson().putBoolean("aaaa", true);
-        var expected = [64, 20, 4, 97, 97, 97, 97, 68, 65];
+        var b = new Binson().putBoolean("a", true);
+        var expected = [64, 20, 1, 97, 68, 65];
         var bytes = b.toBytes();
         var uints = new Uint8Array(bytes);
-        for (var i = 0; i < expected.length; i++) {
-            if (uints[i] != expected[i]) {
-                console.log("uints: " + uints + ", " + uints.length);
-                console.log("expected: " + expected);
-                
-                throw new Error("testBooleanTrue - ERROR; i=" + i + ", " + uints[i] + ", " + expected[i]);
-                break;
-            }
-        }
-    }
+        
+        checkEquality(uints, expected);
+    };
     
     this.testBooleanFalse = function() {
-
-        var b = new Binson().putBoolean("aaaa", false);
-        var expected = [64, 20, 4, 97, 97, 97, 97, 69, 65];
+        var b = new Binson().putBoolean("a", false);
+        var expected = [64, 20, 1, 97, 69, 65];
         var bytes = b.toBytes();
         var uints = new Uint8Array(bytes);
-        for (var i = 0; i < expected.length; i++) {
-            if (uints[i] != expected[i]) {
-                console.log("uints: " + uints + ", " + uints.length);
-                console.log("expected: " + expected);
-                
-                throw new Error("testBooleanTrue - ERROR; i=" + i + ", " + uints[i] + ", " + expected[i]);
-                break;
-            }
-        }
+        
+        checkEquality(uints, expected);
+    };
+    
+    // Test for:
+    // i in [2^7, 2^7-1]
+    // i in [-128, 127]
+    this.testInt8 = function() {
+        var b = new Binson().putInteger("a", 0);
+        var expected = [64, 20, 1, 97, 0, 65];
+        var bytes = b.toBytes();
+        var uints = new Uint8Array(bytes);
+        
+        checkEquality(uints, expected);
     }
     
+    // Test for:
+    // i in [-2^15, 2^15-1], where |i|>=2^7, except i = -2^7
+    // i in [-32768, 32767], where |i|>=128, except i = -128
+    this.testInt16 = function() {
+        var b = new Binson().putInteger("a", 200);
+        
+        // TODO
+    }
+    
+    // Test for:
+    // i in [-2^31, 2^31-1], where |i|>=2^15, except i = -2^15  
+    // i in [-2147483648, 2147483647] where |i|>=32768, except i = -32768
+    this.testInt32 = function() {
+        var b = new Binson().putInteger("a", 70000);
+        
+        // TODO
+    }
+    // Test for:
+    // i in [-2^63, 2^63-1], where |i|>=2^31, except i = -2^31 
+    this.testInt64 = function() {
+        var b = new Binson().putInteger("a", 3000000000);
+        
+        // TODO
+    }
     // Sanity check
     this.test1 = function() {
         var expected = [64, 20, 2, 107, 49, 20, 6, 118, 97, 108, 117, 101, 49, 65];
         
         var b = new Binson().putString("k1", "value1");
         var bytes = b.toBytes();
+        var uints = new Uint8Array(bytes);
         
-        for (var i = 0; i < bytes.length; i++) {
-            if (bytes[i] != expected[i]) {
-                throw "test1 - ERROR, " + i + ", " + bytes[i] + ", " + expected[i];
-                break;
-            }
-        }
+        checkEquality(uints, expected);
     };
     
     this.testEmpty = function() {
         var expected = [64, 65];
         var bytes = new Binson().toBytes();
+        var uints = new Uint8Array(bytes);
         
-        for (var i = 0; i < bytes.length; i++) {
-            if (bytes[i] != expected[i]) {
-                throw "testEmpty - ERROR, " + i + ", " + bytes[i] + ", " + expected[i];
-                break;
-            }
-        }
+        checkEquality(uints, expected);
     };
     
     this.testTwoFields = function() {
@@ -172,27 +182,18 @@ function BinsonTest() {
         }
         
         var bytes = b.toBytes();
+        var uints = new Uint8Array(bytes);
         
-        for (var i = 0; i < bytes.length; i++) {
-            if (bytes[i] != expected[i]) {
-                throw "testTwoFields - ERROR, i=" + i;
-                break;
-            }
-        }
+        checkEquality(uints, expected);
     };
     
     this.testNested = function() {
         var a = new Binson().putObject("b", new Binson());
         var expected = [64, 20, 1, 98, 64, 65, 65];
         var bytes = a.toBytes();
+        var uints = new Uint8Array(bytes);
         
-        for (var i = 0; i < bytes.length; i++) {
-            if (bytes[i] != expected[i]) {
-                console.log("bytes: " + bytes + ", " + bytes.length);
-                console.log("expected: " + expected);
-                throw "testNested - ERROR, i=" + i + ", " + bytes[i] + ", " + expected[i];
-            }
-        }
+        checkEquality(uints, expected);
     };
 }
 
@@ -277,9 +278,11 @@ function BinsonParserTest() {
         
         // {ek=0x111...;}   32-long byte array ("ek").       
         var data = [
-            0x40, 0x14, 0x02, 0x65, 0x6b, 0x18, 0x20, 0xde, 0x52, 0xa1, 0xb7, 0xf1, 0xb6, 
-            0x7e, 0xb4, 0x61, 0x28, 0x53, 0xcc, 0xfb, 0xbc, 0x72, 0xc3, 0xec, 0x54, 0xa8, 
-            0x80, 0x77, 0xd9, 0x2c, 0x74, 0xfd, 0xf8, 0xab, 0x7b, 0x6c, 0x6c, 0x64, 0x38, 0x41
+            0x40, 0x14, 0x02, 0x65, 0x6b, 0x18, 0x20, 0xde,
+            0x52, 0xa1, 0xb7, 0xf1, 0xb6, 0x7e, 0xb4, 0x61, 
+            0x28, 0x53, 0xcc, 0xfb, 0xbc, 0x72, 0xc3, 0xec, 
+            0x54, 0xa8, 0x80, 0x77, 0xd9, 0x2c, 0x74, 0xfd, 
+            0xf8, 0xab, 0x7b, 0x6c, 0x6c, 0x64, 0x38, 0x41
         ];
         
         for (var i = 0; i < data.length; i++) {
@@ -293,6 +296,7 @@ function BinsonParserTest() {
         }
     }
     
+  
     this.testLargeByteArray = function() {
         var buffer = new ArrayBuffer(300);   // more than 127, size in two bytes
         var b1 = new Binson();
@@ -305,5 +309,50 @@ function BinsonParserTest() {
             throw new Error("byteLen " + byteLen);
         }
     }
+    
+    this.testBoolean = function() {
+        var b1 = new Binson();
+        var boolName = "aaa";
+        var boolValue = true;
+        b1.putBoolean(boolName, boolValue);
+        
+        var b2 = Binson.parse(b1.toBytes());
+        var bool = b2.get(boolName);
+        if (bool == undefined) {
+            throw new Error("testBoolean, bool undefined");
+        } else if (!bool) {
+            throw new Error("testBoolean, bool not true");
+        }
+    }
+    
+    this.testMixed = function() {
+        var b1 = new Binson();
+        var aName = "a";
+        var aVal = true;
+        var bName = "b";
+        var bVal = new ArrayBuffer(10);
+        var cName = "c";
+        var cVal = "ABCDE";
+        
+        b1.putBoolean(aName, aVal);
+        b1.putBytes(bName, bVal);
+        b1.putString(cName, cVal);
+        
+        var b2 = Binson.parse(b1.toBytes());
+        var bool = b2.get(aName);
+        var arr = b2.get(bName);
+        var str = b2.get(cName);
+        
+        if(!bool) {
+            throw new Error("bool not true, is: " + bool);
+        }
+        if(arr.byteLength != 10) {
+            throw new Error("arraylength not 10, is: " + arr.byteLength);
+        }
+        if(str != cVal) {
+            throw new Error("string not " + cVal + ", is: " + str);
+        }
+    }
+    
 }
-
+ 

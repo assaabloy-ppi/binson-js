@@ -26,8 +26,8 @@ function Binson() {
     // We use ArrayBuffer for storing raw bytes since it is the base
     // for creating DataView objects.
     //
-    // Status: not complete but supports types: string, bytes, object.
-    // Left: boolean, integer, double, array.
+    // Status: not complete but supports types: string, bytes, object, boolean.
+    // Left: integer, double, array.
     //
     
     this.fields = {};
@@ -52,7 +52,6 @@ function Binson() {
     };
     
     this.putBoolean = function(name, value) {
-        // TODO?
         this.put("boolean", name, value);
         return this;
     }
@@ -76,7 +75,7 @@ function Binson() {
      * Returns Binson bytes, ArrayBuffer.
      */
     this.toBytes = function() {
-        var size = this.byteSize(); 
+        var size = this.byteSize();
         
         if (isNaN(size) || size < 2) {
             throw new Error("bad size, " + size);
@@ -85,10 +84,6 @@ function Binson() {
         var bytes = new DataView(new ArrayBuffer(size));
         var offset = 0;
         var fieldNames = Object.keys(this.fields);
-        
-        if (size < 2) {
-            throw new Error("bad state, Binson.byteSize() returned " + size);
-        }
         
         if (bytes.byteLength != size) {
             throw new Error("bytes has unexpected length, " + bytes.byteLength + ", " + size);
@@ -147,15 +142,13 @@ function Binson() {
     };
     
     this.pBooleanToBytes = function(bytes, offset, bool) {
-
         if (bool) {
             bytes.setUint8(offset, 0x44);
             offset += 1;
         } else {
             bytes.setUint8(offset, 0x45);
             offset += 1;
-        }
-        
+        } 
         return offset;
     }
     
@@ -430,6 +423,18 @@ function BinsonParser() {
             // object
             result.type = "object";
             result.value = this.parseObject();
+            break;
+        case 0x44:
+            // true
+            result.type = "boolean";
+            result.value = true;
+            this.offset += 1;
+            break; 
+        case 0x45:  
+            // false
+            result.type = "boolean";
+            result.value = false
+            this.offset += 1;
             break;
         default:
             throw new Error("error, or unsupported type, " + b);
