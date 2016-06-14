@@ -61,6 +61,11 @@ function runBinsonTests() {
 }
 
 function checkEquality(bytes, expected) {
+    if (expected.length != bytes.length) {
+        throw new Error("Length does not equal expected length. \n\t" +
+            "Expected length: " + expected.length + "\n\t" +
+            "Length: " + bytes.length);
+    }
     for (var i = 0; i < expected.length; i++) {
         if ( bytes[i] != expected[i]) {
             throw new Error("at index: " + i + "\n\t"
@@ -77,7 +82,8 @@ function BinsonTest() {
     this.testBytes = function() {
         var aaaa = new ArrayBuffer(4);
         var b = new Binson().putBytes("aaaa", aaaa);
-        var expected = [64, 20, 4, 97, 97, 97, 97, 24, 4, 0, 0, 0, 0, 65];
+        var expected = [0x40, 0x14, 0x04, 0x61, 0x61, 0x61, 0x61, 
+                0x18, 0x04, 0x00, 0x00, 0x00, 0x00, 0x41];
         var bytes = b.toBytes();
         var uints = new Uint8Array(bytes);
         
@@ -92,7 +98,8 @@ function BinsonTest() {
         u8[2] = 2;
         u8[3] = 3;
         var b = new Binson().putBytes("aaaa", aaaa);
-        var expected = [64, 20, 4, 97, 97, 97, 97, 24, 4, 0, 1, 2, 3, 65];
+        var expected = [0x40, 0x14, 0x04, 0x61, 0x61, 0x61, 0x61, 
+                0x18, 0x04, 0x00, 0x01, 0x02, 0x03, 0x41];
         var bytes = b.toBytes();
         var uints = new Uint8Array(bytes);
         
@@ -101,7 +108,7 @@ function BinsonTest() {
     
     this.testBooleanTrue = function() {
         var b = new Binson().putBoolean("a", true);
-        var expected = [64, 20, 1, 97, 68, 65];
+        var expected = [0x40, 0x14, 0x01, 0x61, 0x44, 0x41];
         var bytes = b.toBytes();
         var uints = new Uint8Array(bytes);
         
@@ -110,7 +117,7 @@ function BinsonTest() {
     
     this.testBooleanFalse = function() {
         var b = new Binson().putBoolean("a", false);
-        var expected = [64, 20, 1, 97, 69, 65];
+        var expected = [0x40, 0x14, 0x01, 0x61, 0x45, 0x41];
         var bytes = b.toBytes();
         var uints = new Uint8Array(bytes);
         
@@ -122,7 +129,7 @@ function BinsonTest() {
     // i in [-128, 127]
     this.testInt8 = function() {
         var b = new Binson().putInteger("a", 0);
-        var expected = [64, 20, 1, 97, 0, 65];
+        var expected = [0x40, 0x14, 0x01, 0x61, 0x10, 0x00, 0x41];
         var bytes = b.toBytes();
         var uints = new Uint8Array(bytes);
         
@@ -155,8 +162,8 @@ function BinsonTest() {
     }
     // Sanity check
     this.test1 = function() {
-        var expected = [64, 20, 2, 107, 49, 20, 6, 118, 97, 108, 117, 101, 49, 65];
-        
+        var expected = [0x40, 0x14, 0x02, 0x6B, 0x31, 
+                0x14, 0x06, 0x76, 0x61, 0x6C, 0x75, 0x65, 0x31, 0x41];
         var b = new Binson().putString("k1", "value1");
         var bytes = b.toBytes();
         var uints = new Uint8Array(bytes);
@@ -165,7 +172,7 @@ function BinsonTest() {
     };
     
     this.testEmpty = function() {
-        var expected = [64, 65];
+        var expected = [0x40, 0x41];
         var bytes = new Binson().toBytes();
         var uints = new Uint8Array(bytes);
         
@@ -173,14 +180,9 @@ function BinsonTest() {
     };
     
     this.testTwoFields = function() {
-        var expected = [64, 20, 2, 107, 49, 20, 2, 118, 49, 20, 2, 107, 50, 20, 2, 118, 50, 65];
+        var expected = [0x40, 0x14, 0x02, 0x6B, 0x31, 0x14, 0x02, 0x76, 0x31, 
+                        0x14, 0x02, 0x6B, 0x32, 0x14, 0x02, 0x76, 0x32, 0x41];
         var b = new Binson().putString("k1", "v1").putString("k2", "v2");
-        
-        var size = b.byteSize();
-        if (size != 18) {
-            throw "bad byteSize computed, was " + size + ", expected " + expected.length;
-        }
-        
         var bytes = b.toBytes();
         var uints = new Uint8Array(bytes);
         
@@ -189,7 +191,7 @@ function BinsonTest() {
     
     this.testNested = function() {
         var a = new Binson().putObject("b", new Binson());
-        var expected = [64, 20, 1, 98, 64, 65, 65];
+        var expected = [0x40, 0x14, 0x01, 0x62, 0x40, 0x41, 0x41];
         var bytes = a.toBytes();
         var uints = new Uint8Array(bytes);
         
@@ -206,7 +208,8 @@ function BinsonParserTest() {
 	this.test1 = function() {
 	    // Result should be equal to new Binson().putString("k1", "value1").
 	    
-		var buffer = arrayToBuffer([64, 20, 2, 107, 49, 20, 6, 118, 97, 108, 117, 101, 49, 65]);
+		var buffer = arrayToBuffer([0x40, 0x14, 0x02, 0x6B, 0x31, 
+		                            0x14, 0x06, 0x76, 0x61, 0x6C, 0x75, 0x65, 0x31, 0x41]);
 		var binson = new BinsonParser().parse(buffer, 0);
 		var k1 = binson.get("k1");
 		
@@ -218,7 +221,8 @@ function BinsonParserTest() {
 	this.test1WithParseFunction = function() {
         // Result should be equal to new Binson().putString("k1", "value1").
         
-        var buffer = arrayToBuffer([64, 20, 2, 107, 49, 20, 6, 118, 97, 108, 117, 101, 49, 65]);
+        var buffer = arrayToBuffer([0x40, 0x14, 0x02, 0x6B, 0x31, 
+                                    0x14, 0x06, 0x76, 0x61, 0x6C, 0x75, 0x65, 0x31, 0x41]);
         var binson = Binson.parse(buffer, 0);
         var k1 = binson.get("k1");
         
@@ -228,7 +232,8 @@ function BinsonParserTest() {
     }
 	
 	this.testTwoFields = function() {
-	    var buffer = arrayToBuffer([64, 20, 2, 107, 49, 20, 2, 118, 49, 20, 2, 107, 50, 20, 2, 118, 50, 65]);
+	    var buffer = arrayToBuffer([0x40, 0x14, 0x02, 0x6B, 0x31, 0x14, 0x02, 0x76, 0x31, 
+	                                0x14, 0x2, 0x6B, 0x32, 0x14, 0x02, 0x76, 0x32, 0x41]);
 	    var binson = new BinsonParser().parse(buffer, 0);
 	    var k1 = binson.get("k1");
 	    var k2 = binson.get("k2");
@@ -243,12 +248,12 @@ function BinsonParserTest() {
 	}
 	
 	this.testEmpty = function() {
-	    var buffer = arrayToBuffer([64, 65]);
+	    var buffer = arrayToBuffer([0x40, 0x41]);
         var binson = new BinsonParser().parse(buffer, 0);
 	}
 	
 	this.testNested = function() {
-	    var buffer = arrayToBuffer([64, 20, 1, 98, 64, 65, 65]);    // {b={};}
+	    var buffer = arrayToBuffer([0x40, 0x14, 0x01, 0x62, 0x40, 0x41, 0x41]);    // {b={};}
 	    var binson = new BinsonParser().parse(buffer, 0);
 	    var nested = binson.get("b");
 	    
@@ -258,7 +263,8 @@ function BinsonParserTest() {
 	}
 	
 	this.testBytes = function() {
-	    var buffer = arrayToBuffer([64, 20, 4, 97, 97, 97, 97, 24, 4, 0, 0, 0, 0, 65]);
+	    var buffer = arrayToBuffer([0x40, 0x14, 0x04, 0x61, 0x61, 0x61, 0x61, 
+	                                0x18, 0x04, 0x00, 0x00, 0x00, 0x00, 0x41]);
 	           // {aaaa=0x00000000;}
 	    var binson = new BinsonParser().parse(buffer, 0);
 	    var aaaa = binson.get("aaaa");
@@ -278,11 +284,11 @@ function BinsonParserTest() {
         
         // {ek=0x111...;}   32-long byte array ("ek").       
         var data = [
-            0x40, 0x14, 0x02, 0x65, 0x6b, 0x18, 0x20, 0xde,
-            0x52, 0xa1, 0xb7, 0xf1, 0xb6, 0x7e, 0xb4, 0x61, 
-            0x28, 0x53, 0xcc, 0xfb, 0xbc, 0x72, 0xc3, 0xec, 
-            0x54, 0xa8, 0x80, 0x77, 0xd9, 0x2c, 0x74, 0xfd, 
-            0xf8, 0xab, 0x7b, 0x6c, 0x6c, 0x64, 0x38, 0x41
+            0x40, 0x14, 0x02, 0x65, 0x6B, 0x18, 0x20, 0xDE,
+            0x52, 0xA1, 0xB7, 0xF1, 0xB6, 0x7E, 0xB4, 0x61, 
+            0x28, 0x53, 0xCC, 0xFB, 0xBC, 0x72, 0xC3, 0xEC, 
+            0x54, 0xA8, 0x80, 0x77, 0xD9, 0x2C, 0x74, 0xFD, 
+            0xF8, 0xAB, 0x7B, 0x6C, 0x6C, 0x64, 0x38, 0x41
         ];
         
         for (var i = 0; i < data.length; i++) {
