@@ -26,8 +26,8 @@ function Binson() {
     // We use ArrayBuffer for storing raw bytes since it is the base
     // for creating DataView objects.
     //
-    // Status: not complete but supports types: string, bytes, object, boolean.
-    // Left: integer, double, array.
+    // Status: not complete but supports types: string, bytes, object, boolean, integer, double.
+    // Left: array.
     //
     
     this.fields = {};
@@ -54,7 +54,18 @@ function Binson() {
     this.putBoolean = function(name, value) {
         this.put("boolean", name, value);
         return this;
-    }
+    };
+    
+    this.putInteger = function(name, value) {
+        this.ensureIntegerPrecision(value);
+        this.put("integer", name, value);
+        return this;
+    };
+    
+    this.putDouble = function(name, value) {
+        this.put("double", name, value);
+        return this;
+    };
     
     this.put = function(type, name, value) {
         this.fields[name] = {type:type, value:value};
@@ -69,7 +80,7 @@ function Binson() {
         } else {
             return f.value;
         }
-    }
+    };
     
     /**
      * Returns Binson bytes, ArrayBuffer.
@@ -135,7 +146,58 @@ function Binson() {
                 break;
             case 'boolean':
                 offset = this.pBooleanToBytes(bytes, offset, value.value);
+                break;
+            case 'integer':
+                offset = this.pIntegerToBytes(bytes, offset, value.value);
+                break;
+            case 'double':
+                offset = this.pDoubleToBytes(bytes, offset, value.value);
+                break;
             // TODO more cases
+        }
+        
+        return offset;
+    };
+    
+    this.pDoubleToBytes = function(bytes, offset, double) {
+        bytes.setUint8(offset, 0x46)
+        offset += 1;
+        
+        bytes.setFloat64(offset, double, true);
+        offset += 8;
+        
+        return offset;
+    }
+    
+    this.pIntegerToBytes = function(bytes, offset, integer) {
+        var size = this.pIntegerSize(integer);
+        
+        if (size == 1) {
+            bytes.setUint8(offset, 0x10);
+            offset += 1;
+            
+            bytes.setInt8(offset, integer);
+            offset += 1;
+            
+        } else if (size == 2) {
+            bytes.setUint8(offset, 0x11);
+            offset += 1;
+            
+            bytes.setInt16(offset, integer, true);
+            offset += 2;
+            
+        } else if (size == 4) {
+            bytes.setUint8(offset, 0x12);
+            offset += 1;
+            
+            bytes.setInt32(offset, integer, true);
+            offset += 4;
+            
+        } else if (size == 8) {
+            // TODO: Handle 64-bit integers             
+            
+        } else { 
+            throw new Error("this.pIntegerSize returned bad bytesize: " + size);
         }
         
         return offset;
@@ -150,7 +212,7 @@ function Binson() {
             offset += 1;
         } 
         return offset;
-    }
+    };
     
     this.pObjectToBytes = function(bytes, offset, obj) {
         if (bytes.byteLength < 2) {
@@ -165,7 +227,7 @@ function Binson() {
         
         for (var i = 0; i < fieldNames.length; i++) {
             var fieldName = fieldNames[i];
-            var field = obj.fields[fieldName];            
+            var field = obj.fields[fieldName];
             offset = obj.pStringToBytes(bytes, offset, fieldName);
             offset = obj.pValueToBytes(bytes, offset, field);
         }
@@ -285,6 +347,13 @@ function Binson() {
             case "boolean":
                 size += 1;
                 break;
+            case "integer":
+                size += 1 + this.pIntegerSize(value.value); // int hex identifier + int8/16/32/64 size
+                break;
+            case "double":
+                size = 1 + 8;           // double hex identifier + size of 64-bit float
+                break;
+                
             // TODO more cases
         }
         
@@ -318,6 +387,14 @@ function Binson() {
         }
         
         return size;
+    };
+    
+    // We don't handle 64-bit integers at this moment
+    this.ensureIntegerPrecision = function(integer) {
+        if (this.pIntegerSize(integer) > 4) {
+            throw new Error("specified integer does not fit in 32 bits.\n\t" +
+                    "Integer: " + integer);
+        }
     };
 }
 
@@ -392,61 +469,8 @@ function BinsonParser() {
         return string;
     };
     
-    //
-    // Parses any type of value and returns it.
-    // result = {type:<type-as-a-string>, value:<the-value>}
-    // ABNF: value = boolean / integer / double / string / bytes / array / object
-    // Focus on: value = string / bytes / object.
-    //
-    this.parseValue = function() {
-        // this.offset not increase here, do it in called functions.
-        var b = this.view.getUint8(this.offset);
-        var result = {};
-        
-        switch (b) {
-        case 0x14:
-        case 0x15:
-        case 0x16:
-            // stringLen
-            result.type = "string";
-            result.value = this.parseString();
-            break;
-            
-        case 0x18:
-        case 0x19:
-        case 0x1a:
-            // bytesLen
-            result.type = "bytes";
-            result.value = this.parseBytes();
-            break;
-        case 0x40:
-            // object
-            result.type = "object";
-            result.value = this.parseObject();
-            break;
-        case 0x44:
-            // true
-            result.type = "boolean";
-            result.value = true;
-            this.offset += 1;
-            break; 
-        case 0x45:  
-            // false
-            result.type = "boolean";
-            result.value = false
-            this.offset += 1;
-            break;
-        default:
-            throw new Error("error, or unsupported type, " + b);
-            break;
-        }
-        
-        return result;
-    };
-    
     this.parseBytes = function() {
         var b = this.view.getUint8(this.offset);
-        var result;
         var len;
         
         this.offset += 1;
@@ -480,6 +504,121 @@ function BinsonParser() {
         }
         
         return bytes;
+    };
+    
+    this.parseInteger = function() {
+        var b = this.view.getUint8(this.offset);
+        this.offset += 1;
+        
+        var result;
+        
+        switch(b) {
+            case 0x10:
+                result = this.view.getInt8(this.offset);
+                this.offset += 1;
+                break;
+                
+            case 0x11:
+                result = this.view.getInt16(this.offset, true);
+                this.offset += 2;
+                break;
+                
+            case 0x12:
+                result = this.view.getInt32(this.offset, true);
+                this.offset += 4;
+                break;
+                
+            case 0x13:
+                // TODO: Get a 64-bit integer
+                // JavaScript support 53 bit precision for integers
+                break;
+                
+            default:
+                throw new Error("unexpected byte when parsing integer: " + b);
+                break;
+        }
+        
+        return result;
     }
+    
+    this.parseDouble = function() {
+        this.offset += 1;
+        
+        var result = this.view.getFloat64(this.offset, true);
+        this.offset += 8;
+        
+        return result;
+    }
+    
+    //
+    // Parses any type of value and returns it.
+    // result = {type:<type-as-a-string>, value:<the-value>}
+    // ABNF: value = boolean / integer / double / string / bytes / array / object
+    // Focus on: value = string / bytes / object.
+    //
+    this.parseValue = function() {
+        // this.offset not increase here, do it in called functions.
+        var b = this.view.getUint8(this.offset);
+        var result = {};
+        
+        switch (b) {
+        case 0x10:
+        case 0x11:
+        case 0x12:
+        case 0x13:
+            // int8/16/32/64
+            result.type = "integer";
+            result.value = this.parseInteger();
+            break;
+            
+        case 0x14:
+        case 0x15:
+        case 0x16:
+            // stringLen
+            result.type = "string";
+            result.value = this.parseString();
+            break;
+            
+        case 0x18:
+        case 0x19:
+        case 0x1a:
+            // bytesLen
+            result.type = "bytes";
+            result.value = this.parseBytes();
+            break;
+            
+        case 0x40:
+            // object
+            result.type = "object";
+            result.value = this.parseObject();
+            break;
+            
+        case 0x44:
+            // true
+            result.type = "boolean";
+            result.value = true;
+            this.offset += 1;
+            break;
+            
+        case 0x45:  
+            // false
+            result.type = "boolean";
+            result.value = false
+            this.offset += 1;
+            break;
+            
+        case 0x46:
+            // double
+            result.type = "double";
+            result.value = this.parseDouble();
+            break;
+            
+        default:
+            throw new Error("error, or unsupported type, " + b);
+            break;
+        }
+        
+        return result;
+    };
 }
 
