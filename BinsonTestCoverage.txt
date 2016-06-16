@@ -1,0 +1,120 @@
+############# BinsonTest object #############
+
+___________________________________________
+
+
+============ OBJECT PROPERTIES ============
+
+    1. The byte sequence must follow the format of the ABNF rule object.
+    2. Values must be stored using as few bytes as possible.
+    3. Fields must be stored in order. The order must be the lexicographical 
+    	order of the [UTF-8] bytes of the name of the fields.
+    4. Two fields of the same object cannot have the same name.
+    5. Little-endian byte-order must be used.
+
+	VALUE TYPE TESTS tests properties 1, 2 & 5.
+	OBJECT PROPERTY TESTS tests properties 3 & 4
+
+========= END OBJECT PROPERTIES ==========
+
+______________________________________________
+
+
+============ VALUE TYPE TESTS ============
+
+	Tests putting a single field. Test 
+	functions that tests multiple values 
+	does this by creating multiple 
+	Binson objects, one for each test case.
+
+------ <VALUE TYPE TESTED> TESTS <(#tests)> ------- 
+testFunction	- <number of tested> - <type (possibly with more details)> - <test specific info>
+------------------ END ----------------- 
+
+
+-------------- BYTES TESTS (2) ------------- 
+testBytes 		- 2 - bytes	- [0x00, 0x00, 0x00, 0x00] & [0x00, 0x01, 0x02, 0x03]
+------------------ END ----------------- 
+
+
+-------------- STRING TESTS (2) ------------- 
+testString 		- 1 - string	- "b"
+testStringLong 	- 1 - string	- 128 characters "123456789012...012345678"
+------------------ END ------------------ 
+
+
+-------------- BOOLEAN TESTS (1) ------------- 
+testBoolean 	- 2 - boolean	- both true and false
+------------------- END ------------------ 
+
+
+-------------- INTEGER TESTS (3) ------------- 
+testInt8 		- 3 - integer	- 127 (largest), -128 (smallest) and 0
+testInt16 		- 4 - integer	- 128 (smallest+), -129 (largest-), 32767 (largest), -32768 (smallest)
+testInt32 		- 4 - integer	- 32768 (smalles+), -32769(largest-), 2147483647 (largest), -2147483648 (smallest)
+------------------ END ------------------ 
+
+
+-------------- DOUBLE TESTS (1) ------------- 
+testDouble		- 1 double: both negative and positive
+------------------ END ------------------ 
+
+
+-------------- ARRAY TESTS (14) --------------
+testArrayEmpty		- 1 - array 							- an empty array
+testArrayBoolean	- 2 - array containing one boolean 		- same as testBoolean
+testArrayInt8		- 3 - array containing one int8			- same as testInt8
+testArrayInt16		- 4 - array containing one int16		- same as testInt16
+testArrayInt32		- 4 - array containing one int32		- same as testInt32
+testArrayInts		- 1 - array containing multiple ints	- of all sizes
+testArrayDouble		- 4 - array containing one double		- same as testDouble
+testArrayDoubles	- 1 - array containing multilpe doubles	-
+testArrayString		- 1 - array containing one string		- same as testString
+testArrayStringLong	- 1 - array containing one string		- same as testStringLong
+testArrayObject		- 2 - array containing one object		- one empty & one non-empty
+testArrayObjects	- 1 - array containing multiple objects	- empty and non-empty
+testArrayBytes		- 2 - array containing one bytes		- same as testBytes
+testArrayNested		- 2 - array containing one array		- both empty and non-empty 
+------------------ END ------------------ 
+
+
+-------------- OBJECT TESTS (2) -------------
+testObjectEmpty		- 1 - object	- empty
+testObjectInteger	- 1 - object	- containing an integer
+------------------ END ------------------ 
+
+============ END VALUE TYPE TESTS ============
+
+______________________________________________
+
+========= OBJECT PROPERTIES TESTS ========
+
+----------- PROPERTY TESTS (3) -----------
+testEmptyObject		- Property 1: Empty object is created and written to bytes
+testOrdering		- Property 3: The field ordering is verified 
+testNameUnique		- Property 4: 
+------------------ END -------------------
+
+======== END OBJECT PROPERTY TESTS =======
+
+
+########## BinsonParserTest object ##########
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
