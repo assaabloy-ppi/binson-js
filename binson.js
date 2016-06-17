@@ -33,46 +33,61 @@ function Binson() {
 	this.fields = {};
 	
 	this.putString = function(name, value) {
-		this.put("string", name, value);
+		this.pPut("string", name, value);
 		return this;
 	};
 	
 	// ArrayBuffer value.
 	this.putBytes = function(name, value) {
 		if (!(value instanceof ArrayBuffer)) {
-			throw new Error("expected ArrayBuffer");
+			throw new Error("this function expect an ArrayBuffer");
 		}
-		this.put("bytes", name, value);
+		this.pPut("bytes", name, value);
 		return this;
 	};
 	
 	this.putObject = function(name, value) {
-		this.put("object", name, value);
+		if (!(value instanceof Binson)) {
+			throw new Error("this function expects a Binson object");
+		}
+		this.pPut("object", name, value);
 		return this;
 	};
 	
 	this.putBoolean = function(name, value) {
-		this.put("boolean", name, value);
+		if (!(typeof(value) === "boolean")) {
+			throw new Error("this function expect a boolean");
+		}
+		this.pPut("boolean", name, value);
 		return this;
 	};
 	
 	this.putInteger = function(name, value) {
+		if (! Number.isInteger(value)) {
+			throw new Error("this function expect an integer");
+		}
 		this.pEnsureIntegerPrecision(value);
-		this.put("integer", name, value);
+		this.pPut("integer", name, value);
 		return this;
 	};
 	
 	this.putDouble = function(name, value) {
-		this.put("double", name, value);
+		if (!(typeof(value) === "number")) {
+			throw new Error("this function expect a number");
+		}
+		this.pPut("double", name, value);
 		return this;
 	};
 	
 	this.putArray = function(name, value) {
-		this.put("array", name, value);
+		if (!(Array.isArray(value))) {
+			throw new Error("this function expects an array");
+		}
+		this.pPut("array", name, value);
 		return this;
 	};
 	
-	this.put = function(type, name, value) {
+	this.pPut = function(type, name, value) {
 		this.fields[name] = {type:type, value:value};
 		return this;
 	};
@@ -306,7 +321,7 @@ function Binson() {
 	
 	this.pBytesToBytes = function(bytes, offset, value) {
 		if (!(value instanceof ArrayBuffer)) {
-			throw new Error("expected ArrayBuffer");
+			throw new Error("expected ArrayBuffer: " + value);
 		}
 		
 		var u8 = new Uint8Array(value);
@@ -628,14 +643,14 @@ function BinsonParser() {
 		if (len < 0) {
 			throw new Error("len negative, not allowed, bad format, " + b + ", " + len);
 		}
-		
-		var bytes = new Uint8Array(len);
+		var buffer= new ArrayBuffer(len);
+		var bytes = new Uint8Array(buffer);
 		for (var i = 0; i < bytes.length; i++) {
 			bytes[i] = this.view.getUint8(this.offset);
 			this.offset += 1;
 		}
 		
-		return bytes;
+		return buffer;
 	};
 	
 	this.parseInteger = function() {
@@ -662,11 +677,19 @@ function BinsonParser() {
 				
 			case 0x13:
 				// TODO: Get a 64-bit integer
-				// JavaScript support 53 bit precision for integers
+				// JavaScript only supports 53 bit integers
+				// binson.js only supports 32 bit integers
+				var bytes = "";
+				for (var i = 0; i < 8; i++) {
+					bytes += this.view.getUint8(this.offset).toString(16) + " ";
+					this.offset += 1;
+				}
+				throw new Error("JavaScript cannot handle 64-bit integers.\n\t" +
+					"Little-endian bytes: " + bytes);
 				break;
 				
 			default:
-				throw new Error("unexpected byte when parsing integer: " + b);
+				throw new Error("unexpected start byte when parsing integer: " + b);
 				break;
 		}
 		
@@ -680,6 +703,22 @@ function BinsonParser() {
 		this.offset += 8;
 		
 		return result;
+	}
+	
+	this.parseArray = function() {
+		this.offset += 1;
+		var array = [];
+		var b;
+		while (true) {
+			b = this.view.getUint8(this.offset);
+			if (b == 0x43) {
+				this.offset += 1;
+				break;
+			}
+			
+			array.push(this.parseValue());
+		}
+		
 	}
 	
 	//
@@ -723,6 +762,12 @@ function BinsonParser() {
 			// object
 			result.type = "object";
 			result.value = this.parseObject();
+			break;
+			
+		case 0x42:
+			// array
+			result.type = "array";
+			result.value = this.parseArray();
 			break;
 			
 		case 0x44:
