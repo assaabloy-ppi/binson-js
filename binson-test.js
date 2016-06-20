@@ -15,7 +15,6 @@ function arrayToBuffer(array) {
 	for (var i = 0; i < len; i++) {
 		view.setUint8(i, array[i]);
 	}
-	
 	return buffer;
 }
 
@@ -132,6 +131,7 @@ function runBinsonTests() {
 function checkEquality(bytes, expected) {
 	var uints = new Uint8Array(bytes);
 	var lenTxt = "";
+	
 	if (expected.length != uints.length) {
 		lenTxt = "\n\t" + "Also: Length does not equal expected length. \n\t" +
 			"Expected length: " + expected.length + "\n\t" +
@@ -151,7 +151,7 @@ function checkEquality(bytes, expected) {
 // ======== BinsonTest object ========
 // See BinsonTestCoverage.txt for more information
 function BinsonTest() {
-	// VALUE TESTS START
+	// VALUE TESTS START HERE
 	this.testBytes = function() {
 		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x18, 0x04, 0x00, 0x00, 0x00, 0x00, 0x41];
 		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x18, 0x04, 0x00, 0x01, 0x02, 0x03, 0x41];
@@ -238,6 +238,7 @@ function BinsonTest() {
 
 	};
 	
+	// Throws error! Putting a string with putBytes should not work!
 	this.testBytesString = function() {
 		new Binson().putBytes("a", "a");
 	};
@@ -277,6 +278,7 @@ function BinsonTest() {
 		checkEquality(bytes, expected);
 	};
 	
+	// Throws error! Putting a boolean with putString should not work!
 	this.testStringBoolean = function() {
 		new Binson().putString("a", true);
 	};
@@ -295,6 +297,7 @@ function BinsonTest() {
 		checkEquality(bytesB, expectedB);
 	};
 	
+	// Throws error! Putting a double with putBoolean should not work!
 	this.testBooleanDouble = function() {
 		new Binson().putBoolean("a", Math.PI);
 	};
@@ -302,6 +305,7 @@ function BinsonTest() {
 	// Test edge cases: (bitpatterns are big-endian)
 	// Bitpattern:  0..0	01..1	   		10..0
 	// Decimal:		0		127 (2^7-1)		-128 (-2^7)
+	// Hexadecimal:	0x00	0x7F			0x80
 	this.testInt8 = function() {
 		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x10, 0x00, 0x41];
 		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x10, 0x7F, 0x41];
@@ -324,9 +328,10 @@ function BinsonTest() {
 		checkEquality(bytesC, expectedC);
 	};
 	
-	// Test edge cases:	(bitpatterns are big-endian)
+	// Test edge cases:	(bitpatterns and hex are big-endian)
 	// Bitpattern:	0..0 10..0		1..1 01..1		10..0 0..0		01..1 1..1
 	// Decimal		128 (2^7)		-129 (-2^7-1)	-32768 (-2^15)	32767 (2^15-1)
+	// Hexadecimal:	0x0080			0xFF7F			0x8000			0x7FFF
 	this.testInt16 = function() {
 		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x11, 0x80, 0x00, 0x41];
 		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x11, 0x7F, 0xFF, 0x41];
@@ -358,6 +363,7 @@ function BinsonTest() {
 	// Test edge cases:	(bitpatterns are big-endian)
 	// Bitpattern:  0..0 0..0 10..0 0..0	1..1 1..1 01..1 1..1	10..0 0..0 0..0 0..0	01..1 1..1 1..1 1..1
 	// Decimal:	 	32768 (2^15)			-32769 (-2^15-1)		-2147483648 (-2^31)		2147483647 (2^31-1)	 
+	// Hexadecimal:	0x00008000				0xFFFF7FFF				0x80000000				0x7FFFFFFF
 	this.testInt32 = function() {
 		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x12, 0x00, 0x80, 0x00, 0x00, 0x41];
 		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x12, 0xFF, 0x7F, 0xFF, 0xFF, 0x41];
@@ -385,6 +391,7 @@ function BinsonTest() {
 		checkEquality(bytesD, expectedD);
 	};
 	
+	// Throws error! Only 32-bit integers are supported in binson.js
 	this.testInt64Pos = function() {
 		// TODO: When 64-bit integers work
 		var a = 2147483648;
@@ -392,6 +399,7 @@ function BinsonTest() {
 		var bin = new Binson().putInteger("a", a);
 	};
 	
+	// Throws error! Only 32-bit integers are supported in binson.js
 	this.testInt64Neg = function() {
 		// TODO: When 64-bit integers work
 		var a = -2147483649;
@@ -399,11 +407,13 @@ function BinsonTest() {
 		var bin = new Binson().putInteger("a", a);
 	};
 	
+	// Throws error! You can only put integers with putInteger
 	this.testIntDouble = function() {
 		new Binson().putInteger("a", Math.PI);
 	}
 	
-	// To generate bitpattern of doubles: http://www.exploringbinary.com/floating-point-converter/
+	// See http://www.exploringbinary.com/floating-point-converter/
+	// in order to generate bitpatterns for 64-bit floats
 	this.testDouble = function() {
 		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x46, 0xBA, 0x17, 0x06, 0x3d, 0x55, 0x55, 0x55, 0xBD, 0x41];
 		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x46, 0xB5, 0x69, 0xA5, 0xE6, 0x87, 0x95, 0x75, 0x40, 0x41];
@@ -421,6 +431,7 @@ function BinsonTest() {
 		checkEquality(bytesB, expectedB);
 	};
 	
+	// Throws error! Putting an ArrayBuffer with putDouble should not work
 	this.testDoubleBytes = function() {
 		new Binson().putDouble("a", new ArrayBuffer(10));
 	}
@@ -529,6 +540,7 @@ function BinsonTest() {
 		checkEquality(bytesD, expectedD);
 	};
 	
+	// Throws error! Binson.js cannot handle 64-bit integers
 	this.testArrayInt64Pos = function() {
 		// TODO: When 64-bit integers work
 		var a = [2147483648];
@@ -536,6 +548,7 @@ function BinsonTest() {
 		var bin = new Binson().putArray("a", a);
 	};
 	
+	// Throws error! Binson.js cannot handle 64-bit integers
 	this.testArrayInt64Neg = function() {
 		// TODO: When 64-bit integers work
 		var a = [-2147483649];
@@ -557,7 +570,8 @@ function BinsonTest() {
 		checkEquality(bytes, expected);		
 	};
 	
-	// To generate bitpattern of doubles: http://www.exploringbinary.com/floating-point-converter/
+	// See: http://www.exploringbinary.com/floating-point-converter/
+	// in order to generate bitpatterns for 64-bit floats
 	this.testArrayDouble = function() {
 		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 0x46, 0xBA, 0x17, 
 							0x06, 0x3d, 0x55, 0x55, 0x55, 0xBD, 0x43, 0x41];
@@ -577,7 +591,8 @@ function BinsonTest() {
 		checkEquality(bytesB, expectedB);
 	};
 	
-	// To generate bitpattern of doubles: http://www.exploringbinary.com/floating-point-converter/
+	// See: http://www.exploringbinary.com/floating-point-converter/
+	// in order to generate bitpatterns for 64-bit floats
 	this.testArrayDoubles = function() {
 		var expected = [0x40, 0x14, 0x01, 0x61, 0x42, 
 						0x46, 0xBA, 0x17, 0x06, 0x3d, 0x55, 0x55, 0x55, 0xBD, 	// First double		-3.0316488E-13
@@ -778,10 +793,12 @@ function BinsonTest() {
 		checkEquality(bytesB, expectedB);
 	};
 	
+	// Throws error! Binson does not support null.
 	this.testArrayNull = function() {
 		new Binson().putArray("a", [1, 2, null, 3]);
 	}
 	
+	// Throws error! Undefined is an invalid array element
 	this.testArrayNestedUndefined = function() {
 		// arr[1][1][2] = undefined
 		new Binson().putArray("a", [true, [Math.PI, [0, 0, undefined]], false, [1,[],new Binson()]]);
@@ -800,15 +817,6 @@ function BinsonTest() {
 		
 		var bInner = new Binson().putInteger("a", 0);
 		var b = new Binson().putObject("a", bInner);
-		var bytes = b.toBytes();
-		
-		checkEquality(bytes, expected);
-	};
-	
-	this.testTwoFields = function() {
-		var expected = [0x40, 0x14, 0x02, 0x6B, 0x31, 0x14, 0x02, 0x76, 0x31, 
-						0x14, 0x02, 0x6B, 0x32, 0x14, 0x02, 0x76, 0x32, 0x41];
-		var b = new Binson().putString("k1", "v1").putString("k2", "v2");
 		var bytes = b.toBytes();
 		
 		checkEquality(bytes, expected);
@@ -838,6 +846,7 @@ function BinsonTest() {
 	};
 	
 	this.testNameUnique = function() {
+		// Make sure a2 overwrites a1
 		var expected = [0x40, 0x14, 0x01, 0x61, 0x10, 0x00, 0x41];
 		var a1 = true;
 		var a2 = 0;
@@ -1243,6 +1252,7 @@ function BinsonParserTest() {
 		checkEquality(bytesD, expectedD);
 	};
 	
+	// Throws error! 64-bit integers are not implemented!
 	this.testParseInt64Pos = function() {
 		// TODO: When there are 64-bit integers
 		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x13, 
@@ -1254,6 +1264,7 @@ function BinsonParserTest() {
 		var binA = new BinsonParser().parse(bufferA, 0);
 	};
 	
+	// Throws error! 64-bit integers are not implemented!
 	this.testParseInt64Neg = function() {
 		// TODO: When there are 64-bit integers
 		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x13, 
@@ -1265,6 +1276,28 @@ function BinsonParserTest() {
 		var binA = new BinsonParser().parse(bufferA, 0);
 	};
 	
+	/*
+	 * This works and generates integers of all sizes with high probability
+	 * for the same reasons as why Benford's law is correct.
+	 *
+	 * Quick reasoning: 
+	 * Math.random() generates numbers in [0,1[ with uniform
+	 * probability. This means that:
+	 * 		* 1/2 of the generated numbers are >=1/2.
+	 *		* 3/4 of the generated numbers are >=1/4.
+	 *		* 7/8 of the generated numbers are >=1/8
+	 *		* 2^(i-1)/2^i of the generated numbers are >=1/2^i for i > 1
+	 * 
+	 * In order to generate a number of size smaller than 2^(i-k) in round i, 
+	 * Math.random() have to return a number of size 1/2^k or smaller.
+	 *
+	 * The implication of this is that it is very improbable for a generated
+	 * number a in round i of the for loop to have log(a) differ from i by a lot.
+	 * 
+	 * More specifically: Pr[|i - log(a)| > 8] = 1/2^8 = 1/256 < 0.4% 
+	 *
+	 * Benford's law: https://en.wikipedia.org/wiki/Benford%27s_law
+	 */
 	this.testParseIntRandom = function() {
 		var a1, a2, b1, b2;
 		var tests = 32;		// if tests > 32 we may get a 33-bit integer
@@ -1724,6 +1757,7 @@ function BinsonParserTest() {
 		checkEquality(bytesD, expectedD);
 	};
 	
+	// Throws error! 64-bit integers are not implemented! 
 	this.testParseArrayInt64Pos = function() {
 		// TODO: When there are 64-bit integers
 		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 
@@ -1736,6 +1770,7 @@ function BinsonParserTest() {
 		var binA = new BinsonParser().parse(bufferA, 0);
 	};
 	
+	// Throws error! 64-bit integers are not implemented!
 	this.testParseArrayInt64Neg = function() {
 		// TODO: When there are 64-bit integers
 		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42,
@@ -2372,8 +2407,13 @@ function BinsonParserTest() {
 		checkEquality(bytesA, expectedA);
 	};
 	
+	// Throws error! 
+	// First field is b = "v2"
+	// Second field is a = "v1"
+	// Violates sorted order of fields
 	this.testParseOrdering = function() {
-		var expectedA = [0x40, 0x14, 0x02, 0x6B, 0x32, 0x14, 0x02, 0x76, 0x32, 
+		var expectedA = [0x40, 
+						0x14, 0x02, 0x6B, 0x32, 0x14, 0x02, 0x76, 0x32, 
 						0x14, 0x03, 0x6B, 0x31, 0x32, 0x14, 0x02, 0x76, 0x31, 0x41];
 		
 		var bufferA = arrayToBuffer(expectedA);
@@ -2381,6 +2421,8 @@ function BinsonParserTest() {
 		var binA = new BinsonParser().parse(bufferA, 0);
 	};
 	
+	// Throws error!
+	// Two fields with same name!
 	this.testParseNameUnique = function() {
 		var expectedA = [0x40, 
 						0x14, 0x01, 0x61, 0x14, 0x01, 0x61, 		// a = "a"
