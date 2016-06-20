@@ -1,8 +1,10 @@
 // ======== Header =========
 // Binson implementation in JavaScript.
-// Author: Frans Lundberg
+// Authors: Frans Lundberg & Felix Grape
 //
-// 2016-06-12. Status: not complete, supports types: string, bytes, object.
+// 2016-06-17. Status: Not complete. Supports types: string, bytes, object, 
+//						boolean, integer, double, array. Does not support
+//						64-bit integers due to JavaScript limitations
 //
 //
 //
@@ -26,13 +28,13 @@ function Binson() {
 	// We use ArrayBuffer for storing raw bytes since it is the base
 	// for creating DataView objects.
 	//
-	// Status: not complete but supports types: string, bytes, object, boolean, integer, double.
-	// Left: array.
-	//
 	
 	this.fields = {};
 	
 	this.putString = function(name, value) {
+		if (!(typeof(value) === "string")) {
+			throw new Error("putString expected string");
+		}
 		this.pPut("string", name, value);
 		return this;
 	};
@@ -40,7 +42,7 @@ function Binson() {
 	// ArrayBuffer value.
 	this.putBytes = function(name, value) {
 		if (!(value instanceof ArrayBuffer)) {
-			throw new Error("this function expect an ArrayBuffer");
+			throw new Error("putBytes expected ArrayBuffer");
 		}
 		this.pPut("bytes", name, value);
 		return this;
@@ -48,7 +50,7 @@ function Binson() {
 	
 	this.putObject = function(name, value) {
 		if (!(value instanceof Binson)) {
-			throw new Error("this function expects a Binson object");
+			throw new Error("putObject expected a Binson object");
 		}
 		this.pPut("object", name, value);
 		return this;
@@ -56,7 +58,7 @@ function Binson() {
 	
 	this.putBoolean = function(name, value) {
 		if (!(typeof(value) === "boolean")) {
-			throw new Error("this function expect a boolean");
+			throw new Error("putBoolean expected a boolean");
 		}
 		this.pPut("boolean", name, value);
 		return this;
@@ -64,7 +66,7 @@ function Binson() {
 	
 	this.putInteger = function(name, value) {
 		if (! Number.isInteger(value)) {
-			throw new Error("this function expect an integer");
+			throw new Error("putInteger expected an integer");
 		}
 		this.pEnsureIntegerPrecision(value);
 		this.pPut("integer", name, value);
@@ -73,7 +75,7 @@ function Binson() {
 	
 	this.putDouble = function(name, value) {
 		if (!(typeof(value) === "number")) {
-			throw new Error("this function expect a number");
+			throw new Error("putDouble expected a number");
 		}
 		this.pPut("double", name, value);
 		return this;
@@ -81,8 +83,9 @@ function Binson() {
 	
 	this.putArray = function(name, value) {
 		if (!(Array.isArray(value))) {
-			throw new Error("this function expects an array");
+			throw new Error("putArray expected an array");
 		}
+		this.pBinsonTypeCheckArray(name, value);
 		this.pPut("array", name, value);
 		return this;
 	};
@@ -188,6 +191,7 @@ function Binson() {
 		for (var i = 0; i < array.length; i++){
 			elem = array[i];
 			var binsonType = this.pBinsonTypeOf(elem);
+
 			switch(binsonType) {
 				case 'array':
 					offset = this.pArrayToBytes(bytes, offset, elem);
@@ -206,7 +210,6 @@ function Binson() {
 					break;
 					
 				case 'integer':
-					this.pEnsureIntegerPrecision(elem);
 					offset = this.pIntegerToBytes(bytes, offset, elem);
 					break;
 					
@@ -262,7 +265,6 @@ function Binson() {
 			
 		} else if (size == 8) {
 			// TODO: Handle 64-bit integers
-			
 		} else { 
 			throw new Error("this.pIntegerSize returned bad bytesize: " + size);
 		}
@@ -516,6 +518,7 @@ function Binson() {
 					
 				case 'number':
 					if (Number.isInteger(v)) {
+						this.pEnsureIntegerPrecision(v);
 						return 'integer';
 					} else {
 						return 'double';
@@ -525,7 +528,7 @@ function Binson() {
 					return 'string';
 					
 				case 'object':
-					if (v instanceof Array) {
+					if (Array.isArray(v)) {
 						return 'array';
 					}
 					if (v instanceof ArrayBuffer) {
@@ -540,8 +543,42 @@ function Binson() {
 				   
 				default:
 					throw new Error("A variable must be a boolean, number (integer or float), string, " +
-						"instance of an ArrayBuffer, array, Binson object.");
+						"instance of an ArrayBuffer, array, Binson object.\n\t" + 
+						"Type: " + type);
 			}
+	};
+	
+	this.pBinsonTypeCheckArray = function(name, array) {
+		for (var i = 0; i < array.length; i++) {
+			try {
+				this.pBinsonTypeOf(array[i]);
+				if (Array.isArray(array[i])) {
+					this.pBinsonTypeCheckArray("!!Nested!!", array[i]);
+				}
+			} catch (err) {
+				throw new Error("Invalid array element: \n\t" +
+					"Position: " + i + "\n\t" + 
+					"Name: \"" + name + "\"\n\t" +
+					"Element: " + array[i] + "\n\n\t" +
+					err);
+			}
+		}
+	};
+	
+	// Returns the bytes of the binson as a string
+	this.toString = function(){
+		var buffer = this.toBytes();
+		var uints = new Uint8Array(buffer);
+		var res = "[";
+		for (var i = 0; i < uints.length-1; i++) {
+			if (uints[i] < 10) {
+				res += "0x0" + uints[i].toString(16) + ", ";
+			} else {
+				res += "0x" + uints[i].toString(16) + ", ";
+			}
+		}
+		res += "0x" + uints[uints.length-1].toString(16) + "]";
+		return res;
 	};
 }
 
@@ -567,19 +604,39 @@ function BinsonParser() {
 		var b = this.view.getUint8(this.offset);
 		this.offset += 1;
 		if (b != 0x40) {
-			throw new Error("bad first byte in object, " + b + " expected 64 (0x40)");
+			throw new Error("bad first byte in object, 0x" + b.toString(16) + " expected 0x40");
 		}
-		
+		var name, prevName, value;
+		var prevName = "";
 		while (true) {
 			b = this.view.getUint8(this.offset);
 			if (b == 0x41) {
+				this.offset += 1;
 				break;
 			}
+			var fieldOffset = this.offset;
+			name = this.parseString();
+			value = this.parseValue();   
 			
-			var name = this.parseString();
-			var value = this.parseValue();   
+			if (name < prevName) {
+				throw new Error("Bad format. \n\t" +
+					"Fields not in lexicographical order when parsing. \n\t\t" +
+						"Previous field: " + prevName + "\n\t\t" +
+						"Current field: " + name);
+			}
+			if (!(typeof(result.fields[name]) == "undefined" )) {
+				var str = this.pParsedtoByteString();
+				throw new Error("Bad format. \n\t" +
+					"Found two fields with the same name when parsing. \n\t\t" +
+						"Duplicate field name at: " + fieldOffset + "\n\t\t" +
+						"Field name: \"" + name + "\"\n\t\t" +
+						"1st value: " + result.fields[name].value + "\n\t\t" +
+						"2nd value: " + value.value + "\n\t\t" +
+						"Bytes: " + str);
+			}
+			prevName = name;
 			
-			result.put(value.type, name, value.value);
+			result.pPut(value.type, name, value.value);
 		}
 		
 		return result;
@@ -716,8 +773,11 @@ function BinsonParser() {
 				break;
 			}
 			
-			array.push(this.parseValue());
+			// parseValue returns Object { type: <binsonType>, value: <value> }
+			array.push(this.parseValue().value);
 		}
+		
+		return array;
 		
 	}
 	
@@ -791,11 +851,43 @@ function BinsonParser() {
 			break;
 			
 		default:
-			throw new Error("error, or unsupported type, " + b);
+			throw new Error("error, or unsupported type. \n\t"+
+			"Byte: 0x" + b.toString(16) + "\n\t" +
+			"Offset: " + this.offset);
 			break;
 		}
 		
 		return result;
+	};
+	
+	//
+	// Returns what has been parsed so far as a string of bytes 
+	// as hexadecimal values
+	// 
+	this.pParsedtoByteString = function() {
+		// this.offset points at the next thing to be parsed
+		this.offset -= 1;
+		
+		var str = "[";
+		var byte;
+		for (var i = 0; i < this.offset-1; i++) {
+			byte = this.view.getUint8(i);
+			if (byte < 10) {
+				str += "0x0" + byte.toString(16) + ", ";
+			} else {
+				str += "0x" + byte.toString(16) + ", ";
+			}
+		}
+		byte = this.view.getUint8(this.offset);
+		if (byte < 10) {
+			str += "0x0" + byte.toString(16) + ", ... (not parsed)]";
+		} else {
+			str += "0x" + byte.toString(16) + ", ... (not parsed)]";
+		}
+		
+		// So that this.offset is unchanged by the function
+		this.offset += 1;
+		return str
 	};
 }
 
