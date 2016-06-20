@@ -14,8 +14,9 @@ Just include binson.js in your project. It has no dependencies.
 Status
 ======
 
-2016-06-12. This is work in progress. There is some support for 
-the Binson types: string, bytes, object.
+2016-06-20. This is work in progress. There is support for 
+all Binson types except for 64-bit integers due to the fact
+that all numbers in JavaScript are 64-bit floats.
 
 
 For binson-js developers
