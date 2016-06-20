@@ -1,7 +1,7 @@
 // Tests for binson.js.
 // Run tests with code: [runBinsonTests()]. See JavaScript console for output.
 //
-// Author: Frans Lundberg
+// Authors: Frans Lundberg & Felix Grape
 //
 
 // ======== Functions ========
@@ -26,23 +26,33 @@ function runBinsonTests() {
 	var testSuit = [
 		// Binson Object Testing
 		{name: "b.testBytes", f:b.testBytes},
+		{name: "b.testBytesLong", f:b.testBytesLong},
+		{name: "b.testBytesString", f:b.testBytesString},
 		
 		{name: "b.testString", f:b.testString},
 		{name: "b.testStringLong", f:b.testStringLong},
+		{name: "b.testStringBoolean", f:b.testStringBoolean},
 		
 		{name: "b.testBoolean", f:b.testBoolean},
+		{name: "b.testBooleanDouble", f:b.testBooleanDouble},
 		
 		{name: "b.testInt8", f:b.testInt8},
 		{name: "b.testInt16", f:b.testInt16},
 		{name: "b.testInt32", f:b.testInt32},
+		{name: "b.testInt64Pos", f:b.testInt64Pos},
+		{name: "b.testInt64Neg", f:b.testInt64Neg},
+		{name: "b.testIntDouble", f:b.testIntDouble},
 		
 		{name: "b.testDouble", f:b.testDouble},
+		{name: "b.testDoubleBytes", f:b.testDoubleBytes},
 		
 		{name: "b.testArrayEmpty", f:b.testArrayEmpty},
 		{name: "b.testArrayBoolean", f:b.testArrayBoolean},
 		{name: "b.testArrayInt8", f:b.testArrayInt8},
 		{name: "b.testArrayInt16", f:b.testArrayInt16},
 		{name: "b.testArrayInt32", f:b.testArrayInt32},
+		{name: "b.testArrayInt64Pos", f:b.testArrayInt64Pos},
+		{name: "b.testArrayInt64Neg", f:b.testArrayInt64Neg},
 		{name: "b.testArrayInts", f:b.testArrayInts},
 		{name: "b.testArrayDouble", f:b.testArrayDouble},
 		{name: "b.testArrayDoubles", f:b.testArrayDoubles},
@@ -51,7 +61,10 @@ function runBinsonTests() {
 		{name: "b.testArrayObject", f:b.testArrayObject},
 		{name: "b.testArrayObjects", f:b.testArrayObjects},
 		{name: "b.testArrayBytes", f:b.testArrayBytes},
+		{name: "b.testArrayBytesLong", f:b.testArrayBytesLong},
 		{name: "b.testArrayNested", f:b.testArrayNested},
+		{name: "b.testArrayNull", f:b.testArrayNull},
+		{name: "b.testArrayNestedUndefined", f:b.testArrayNestedUndefined},
 		
 		{name: "b.testObjectEmpty", f:b.testObjectEmpty},
 		{name: "b.testObjectInteger", f:b.testObjectInteger},
@@ -61,22 +74,48 @@ function runBinsonTests() {
 		{name: "b.testOrdering", f:b.testOrdering},
 		
 		// Binson Parser Testing
-		{name: "p.test1", f:p.test1},
-		{name: "p.test1WithParseFunction", f:p.test1WithParseFunction},
-		{name: "p.testTwoFields", f:p.testTwoFields},
-		{name: "p.testEmpty", f:p.testEmpty},
-		{name: "p.testNested", f:p.testNested},
-		{name: "p.testBytes", f:p.testBytes},
 		{name: "p.testParseBytes", f:p.testParseBytes},
-		{name: "p.testLargeByteArray", f:p.testLargeByteArray},
+		{name: "p.testParseBytesLong", f:p.testParseBytesLong},
+		
+		{name: "p.testParseString", f:p.testParseString},
+		{name: "p.testParseStringLong", f:p.testParseStringLong},
+		
 		{name: "p.testParseBoolean", f:p.testParseBoolean},
-		{name: "p.testMixed", f:p.testMixed},
+		
 		{name: "p.testParseInt8", f:p.testParseInt8},
 		{name: "p.testParseInt16", f:p.testParseInt16},
 		{name: "p.testParseInt32", f:p.testParseInt32},
+		{name: "p.testParseInt64Pos", f:p.testParseInt64Pos},
+		{name: "p.testParseInt64Neg", f:p.testParseInt64Neg},
 		{name: "p.testParseIntRandom", f:p.testParseIntRandom},
+		
 		{name: "p.testParseDouble", f:p.testParseDouble},
-		{name: "p.testParseDoubleRandom", f:p.testParseDoubleRandom} 
+		{name: "p.testParseDoubleRandom", f:p.testParseDoubleRandom},
+		
+		{name: "p.testParseArrayEmpty", f:p.testParseArrayEmpty},
+		{name: "p.testParseArrayBoolean", f:p.testParseArrayBoolean},
+		{name: "p.testParseArrayInt8", f:p.testParseArrayInt8},
+		{name: "p.testParseArrayInt16", f:p.testParseArrayInt16},
+		{name: "p.testParseArrayInt32", f:p.testParseArrayInt32},
+		{name: "p.testParseArrayInt64Pos", f:p.testParseArrayInt64Pos},
+		{name: "p.testParseArrayInt64Neg", f:p.testParseArrayInt64Neg},
+		{name: "p.testParseArrayInts", f:p.testParseArrayInts},
+		{name: "p.testParseArrayDouble", f:p.testParseArrayDouble},
+		{name: "p.testParseArrayDoubles", f:p.testParseArrayDoubles},
+		{name: "p.testParseArrayString", f:p.testParseArrayString},
+		{name: "p.testParseArrayStringLong", f:p.testParseArrayStringLong},
+		{name: "p.testParseArrayObject", f:p.testParseArrayObject},
+		{name: "p.testParseArrayObjects", f:p.testParseArrayObjects},
+		{name: "p.testParseArrayBytes", f:p.testParseArrayBytes},
+		{name: "p.testParseArrayBytesLong", f:p.testParseArrayBytesLong},
+		{name: "p.testParseArrayNested", f:p.testParseArrayNested},
+		
+		{name: "p.testParseObjectEmpty", f:p.testParseObjectEmpty},
+		{name: "p.testParseObjectInteger", f:p.testParseObjectInteger},
+		
+		{name: "p.testParseEmptyObject", f:p.testParseEmptyObject},
+		{name: "p.testParseOrdering", f:p.testParseOrdering},
+		{name: "p.testParseNameUnique", f:p.testParseNameUnique}
 	];
 	
 	for (var i = 0; i < testSuit.length; i++) {
@@ -135,6 +174,74 @@ function BinsonTest() {
 		checkEquality(bytesB, expectedB);
 	};
 	
+	this.testBytesLong = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x19, 0x80, 0x00, 
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x41];
+		
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x19, 0x80, 0x00, 
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x41];
+						
+		var data = [0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38];
+		
+		var a = new ArrayBuffer(128);
+		var b = new ArrayBuffer(128);
+		var u8 = new Uint8Array(b);
+		
+		for (var i = 0; i < b.byteLength; i++) {
+			u8[i] = data[i];
+		}
+		
+		var binA = new Binson().putBytes("a", a);
+		var binB = new Binson().putBytes("a", b);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+
+	};
+	
+	this.testBytesString = function() {
+		new Binson().putBytes("a", "a");
+	};
+	
 	this.testString = function() {
 		var expected = [0x40, 0x14, 0x01, 0x61, 0x14, 0x01, 0x62, 0x41];
 		var b = new Binson().putString("a", "b");
@@ -170,6 +277,10 @@ function BinsonTest() {
 		checkEquality(bytes, expected);
 	};
 	
+	this.testStringBoolean = function() {
+		new Binson().putString("a", true);
+	};
+	
 	this.testBoolean = function() {
 		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x44, 0x41];
 		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x45, 0x41];
@@ -182,6 +293,10 @@ function BinsonTest() {
 		
 		checkEquality(bytesA, expectedA);
 		checkEquality(bytesB, expectedB);
+	};
+	
+	this.testBooleanDouble = function() {
+		new Binson().putBoolean("a", Math.PI);
 	};
 	
 	// Test edge cases: (bitpatterns are big-endian)
@@ -270,6 +385,24 @@ function BinsonTest() {
 		checkEquality(bytesD, expectedD);
 	};
 	
+	this.testInt64Pos = function() {
+		// TODO: When 64-bit integers work
+		var a = 2147483648;
+		// This call _WILL_ throw a new Error
+		var bin = new Binson().putInteger("a", a);
+	};
+	
+	this.testInt64Neg = function() {
+		// TODO: When 64-bit integers work
+		var a = -2147483649;
+		// This call _WILL_ throw a new Error
+		var bin = new Binson().putInteger("a", a);
+	};
+	
+	this.testIntDouble = function() {
+		new Binson().putInteger("a", Math.PI);
+	}
+	
 	// To generate bitpattern of doubles: http://www.exploringbinary.com/floating-point-converter/
 	this.testDouble = function() {
 		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x46, 0xBA, 0x17, 0x06, 0x3d, 0x55, 0x55, 0x55, 0xBD, 0x41];
@@ -287,6 +420,10 @@ function BinsonTest() {
 		checkEquality(bytesA, expectedA);
 		checkEquality(bytesB, expectedB);
 	};
+	
+	this.testDoubleBytes = function() {
+		new Binson().putDouble("a", new ArrayBuffer(10));
+	}
 	
 	this.testArrayEmpty = function() {
 		var expected = [0x40, 0x14, 0x01, 0x61, 0x42, 0x43, 0x41];
@@ -390,6 +527,20 @@ function BinsonTest() {
 		checkEquality(bytesB, expectedB);
 		checkEquality(bytesC, expectedC);
 		checkEquality(bytesD, expectedD);
+	};
+	
+	this.testArrayInt64Pos = function() {
+		// TODO: When 64-bit integers work
+		var a = [2147483648];
+		// This call _WILL_ throw a new Error
+		var bin = new Binson().putArray("a", a);
+	};
+	
+	this.testArrayInt64Neg = function() {
+		// TODO: When 64-bit integers work
+		var a = [-2147483649];
+		// This call _WILL_ throw a new Error
+		var bin = new Binson().putArray("a", a);
 	};
 	
 	this.testArrayInts = function() {
@@ -544,6 +695,71 @@ function BinsonTest() {
 		checkEquality(bytesB, expectedB);
 	};
 	
+	this.testArrayBytesLong = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 0x19, 0x80, 0x00, 
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x43, 0x41];
+		
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x42, 0x19, 0x80, 0x00, 
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x43, 0x41];
+						
+		var data = [0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38];
+		
+		var aBuff = new ArrayBuffer(128);
+		var bBuff = new ArrayBuffer(128);
+		var u8 = new Uint8Array(bBuff);
+		
+		for (var i = 0; i < data.length; i++) {
+			u8[i] = data[i];
+		}
+		
+		var a = [aBuff];
+		var b = [bBuff];
+		
+		var binA = new Binson().putArray("a", a);
+		var binB = new Binson().putArray("a", b);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+	};
 	
 	this.testArrayNested = function() {
 		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 0x42, 0x43, 0x43, 0x41];
@@ -562,6 +778,15 @@ function BinsonTest() {
 		checkEquality(bytesB, expectedB);
 	};
 	
+	this.testArrayNull = function() {
+		new Binson().putArray("a", [1, 2, null, 3]);
+	}
+	
+	this.testArrayNestedUndefined = function() {
+		// arr[1][1][2] = undefined
+		new Binson().putArray("a", [true, [Math.PI, [0, 0, undefined]], false, [1,[],new Binson()]]);
+	}
+	
 	this.testObjectEmpty = function() {
 		var a = new Binson().putObject("b", new Binson());
 		var expected = [0x40, 0x14, 0x01, 0x62, 0x40, 0x41, 0x41];
@@ -578,7 +803,7 @@ function BinsonTest() {
 		var bytes = b.toBytes();
 		
 		checkEquality(bytes, expected);
-	}
+	};
 	
 	this.testTwoFields = function() {
 		var expected = [0x40, 0x14, 0x02, 0x6B, 0x31, 0x14, 0x02, 0x76, 0x31, 
@@ -614,12 +839,12 @@ function BinsonTest() {
 	
 	this.testNameUnique = function() {
 		var expected = [0x40, 0x14, 0x01, 0x61, 0x10, 0x00, 0x41];
-		var a1 = 10;
+		var a1 = true;
 		var a2 = 0;
 		
 		var b = new Binson();
 		
-		b.putInteger("a", a1); 	// bytes of b: [0x40, 0x14, 0x01, 0x61, 0x10, 0x0A, 0x41];
+		b.putBoolean("a", a1); 	// bytes of b: [0x40, 0x14, 0x01, 0x61, 0x10, 0x0A, 0x41];
 		b.putInteger("a", a2);
 		
 		var bytes = b.toBytes();
@@ -633,245 +858,416 @@ function BinsonTest() {
 //
 
 function BinsonParserTest() {
-	this.test1WithParseFunction = function() {
-		// Result should be equal to new Binson().putString("k1", "value1").
-		
-		var buffer = arrayToBuffer([0x40, 0x14, 0x02, 0x6B, 0x31, 
-									0x14, 0x06, 0x76, 0x61, 0x6C, 0x75, 0x65, 0x31, 0x41]);
-		var binson = Binson.parse(buffer, 0);
-		var k1 = binson.get("k1");
-		
-		if (!(k1 === "value1")) {
-			throw new Error("test1 - " + k1);
-		}
-	};
-	
-	this.testTwoFields = function() {
-		var buffer = arrayToBuffer([0x40, 0x14, 0x02, 0x6B, 0x31, 0x14, 0x02, 0x76, 0x31, 
-									0x14, 0x2, 0x6B, 0x32, 0x14, 0x02, 0x76, 0x32, 0x41]);
-		var binson = new BinsonParser().parse(buffer, 0);
-		var k1 = binson.get("k1");
-		var k2 = binson.get("k2");
-		
-		if (!(k1 === "v1")) {
-			throw new Error("testTwoFields, k1 - " + k1);
-		}
-		
-		if (!(k2 === "v2")) {
-			throw new Error("testTwoFields, k2 - " + k2);
-		}
-	};
-	
-	this.testEmpty = function() {
-		var buffer = arrayToBuffer([0x40, 0x41]);
-		var binson = new BinsonParser().parse(buffer, 0);
-	};
-	
-	this.testNested = function() {
-		var buffer = arrayToBuffer([0x40, 0x14, 0x01, 0x62, 0x40, 0x41, 0x41]);	// {b={};}
-		var binson = new BinsonParser().parse(buffer, 0);
-		var nested = binson.get("b");
-		
-		if (nested === undefined) {
-			throw new Error("testNested, undefined");
-		}
-	};
-	
-	this.testBytes = function() {
-		var buffer = arrayToBuffer([0x40, 0x14, 0x04, 0x61, 0x61, 0x61, 0x61, 
-									0x18, 0x04, 0x00, 0x00, 0x00, 0x00, 0x41]);
-			   // {aaaa=0x00000000;}
-		var binson = new BinsonParser().parse(buffer, 0);
-		var aaaa = binson.get("aaaa");
-		
-		if (aaaa === undefined) {
-			throw new Error("testBytes, aaaa undefined");
-		}
-		
-		if (!(aaaa instanceof Uint8Array)) {
-			throw new Error("testBytes, unexpected type, " + typeof(aaaa) + ", " + aaaa);
-		}
-	};
-	
 	this.testParseBytes = function() {
-		var buffer = new ArrayBuffer(40);
-		var u8 = new Uint8Array(buffer);
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x18, 0x04, 0x00, 0x01, 0x00, 0x00, 0x41];
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x18, 0x04, 0x00, 0x01, 0x02, 0x03, 0x41];
+									
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
 		
-		// {ek=0x111...;}   32-long byte array ("ek").	   
-		var data = [
-			0x40, 0x14, 0x02, 0x65, 0x6B, 0x18, 0x20, 0xDE,
-			0x52, 0xA1, 0xB7, 0xF1, 0xB6, 0x7E, 0xB4, 0x61, 
-			0x28, 0x53, 0xCC, 0xFB, 0xBC, 0x72, 0xC3, 0xEC, 
-			0x54, 0xA8, 0x80, 0x77, 0xD9, 0x2C, 0x74, 0xFD, 
-			0xF8, 0xAB, 0x7B, 0x6C, 0x6C, 0x64, 0x38, 0x41
-		];
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
 		
-		for (var i = 0; i < data.length; i++) {
-			u8[i] = data[i];
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+		
+		
+		if (!(parsedA instanceof ArrayBuffer)) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		if (!(parsedB instanceof ArrayBuffer)) {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
 		}
 		
-		var b = Binson.parse(buffer, 0);
-		var ek = b.get("ek");
-		if (ek === undefined) {
-			throw new Error("testParseBytes, ek undefined");
-		}
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
 	};
 	
-	
-	this.testLargeByteArray = function() {
-		var buffer = new ArrayBuffer(300);   // more than 127, size in two bytes
-		var b1 = new Binson();
-		b1.putBytes("bytes", buffer);
+	this.testParseBytesLong = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x19, 0x80, 0x00, 
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x41];
+						
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x19, 0x80, 0x00, 
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x41];
+									
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
 		
-		var b2 = Binson.parse(b1.toBytes());
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
 		
-		var byteLen = b2.get("bytes").byteLength;
-		if (byteLen != 300) {
-			throw new Error("byteLen " + byteLen);
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+		
+		
+		if (!(parsedA instanceof ArrayBuffer)) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
 		}
+		if (!(parsedB instanceof ArrayBuffer)) {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+	
 	};
 	
+	this.testParseString = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x14, 0x01, 0x62, 0x41];
+		var a = "b";				
+		var bufferA = arrayToBuffer(expectedA);		
+						
+		var binA = new BinsonParser().parse(bufferA, 0);
+		
+		var bytesA = binA.toBytes();
+		var parsedA = binA.get("a");
+		
+		if ((typeof(parsedA) !== "string")) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		if (a !== parsedA) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + a + "\n\t" +
+						"Parsed: " + parsedA);
+		}
+		
+		checkEquality(bytesA, expectedA);
+	};
+	
+	this.testParseStringLong = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x15, 0x80, 0x00,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x41];
+		var a = "";
+		a += "12345678901234567890123456789012345678901234567890";
+		a += "12345678901234567890123456789012345678901234567890";
+		a += "1234567890123456789012345678";
+		
+		var bufferA = arrayToBuffer(expectedA);		
+						
+		var binA = new BinsonParser().parse(bufferA, 0);
+		
+		var bytesA = binA.toBytes();
+		var parsedA = binA.get("a");
+		
+		if (typeof(parsedA) !== "string") {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		if (a !== parsedA) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + a + "\n\t" +
+						"Parsed: " + parsedA);
+		}
+		
+		checkEquality(bytesA, expectedA);
+	};
+
 	this.testParseBoolean = function() {
-		var b1 = new Binson();
-		var boolName = "aaa";
-		var boolValue = true;
-		b1.putBoolean(boolName, boolValue);
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x44, 0x41];
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x45, 0x41];
 		
-		var b2 = Binson.parse(b1.toBytes());
-		var bool = b2.get(boolName);
-		if (bool !== boolValue) {
-			throw new Error("input boolean does not match parsed boolean. \n\t" +
-					"Input: " + boolValue + "\n\t" +
-					"Parsed: " + bool);
-		} 
+		var a = true;
+		var b = false;
+									
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+		
+		
+		if (typeof(parsedA) !== "boolean") {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		if (typeof(parsedB) !== "boolean") {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		
+		if (a !== parsedA) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + a + "\n\t" +
+						"Parsed: " + parsedA);
+		}
+		if (b !== parsedB) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + b + "\n\t" +
+						"Parsed: " + parsedB);
+		}
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
 	};
 	
-	this.testMixed = function() {
-		var b1 = new Binson();
-		var aName = "a";
-		var aVal = true;
-		var bName = "b";
-		var bVal = new ArrayBuffer(10);
-		var cName = "c";
-		var cVal = "ABCDE";
-		
-		b1.putBoolean(aName, aVal);
-		b1.putBytes(bName, bVal);
-		b1.putString(cName, cVal);
-		
-		var b2 = Binson.parse(b1.toBytes());
-		var bool = b2.get(aName);
-		var arr = b2.get(bName);
-		var str = b2.get(cName);
-		
-		if(!bool) {
-			throw new Error("bool not true, is: " + bool);
-		}
-		if(arr.byteLength != 10) {
-			throw new Error("byte buffer not 10 bytes, is: " + arr.byteLength);
-		}
-		if(str !== cVal) {
-			throw new Error("string not " + cVal + ", is: " + str);
-		}
-	};
-	
-	this.testParseDouble = function() {
-		var b1 = new Binson();
-		var aName = "a";
-		var aVal  = 345.3456789456789;
-		
-		b1.putDouble(aName, aVal);
-		
-		var b2 = Binson.parse(b1.toBytes());
-		var double = b2.get(aName);
-		
-		if (aVal !== double) {
-			throw new Error("input double does not match parsed double. \n\t" + 
-					"Input: " + aVal + "\n\t" +
-					"Parsed: " + double);
-		}
-	};
-	
-	this.testParseDoubleRandom = function() {
-		var a1, a2, b1, b2;
-		var tests = 50;
-		
-		for (var i = 0; i < tests; i++) {
-			a1 = Math.random() * Math.pow(2, i);
-			b1 = new Binson().putDouble("a", a1);
-			b2 = Binson.parse(b1.toBytes());
-			a2 = b2.get("a");
-			
-			if (a1 !== a2) {
-				throw new Error("input double does not match parsed double. \n\t" +
-						"Input: " + a1 + "\n\t" + 
-						"Parsed: " + a2);
-			}
-		}  
-	};
-	
-	// Test for:
-	// i in [0xFF, 0x7F]
 	this.testParseInt8 = function() {
-		var expected = [0x40, 0x14, 0x01, 0x61, 0x10, 0x00, 0x41];
-		var b1 = new Binson();
-		var aName = "a";
-		var aVal = 0x00;
-		b1.putInteger(aName, aVal);
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x10, 0x00, 0x41];
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x10, 0x7F, 0x41];
+		var expectedC = [0x40, 0x14, 0x01, 0x61, 0x10, 0x80, 0x41];
 		
-		var b2 = Binson.parse(b1.toBytes());
-		var int = b2.get(aName);
+		var a = 0;
+		var b = 127;
+		var c = -128;
+									
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
+		var bufferC = arrayToBuffer(expectedC);
 		
-		if (int !== aVal) {
-			throw new Error("input integer does not match parsed integer. \n\t" +
-					"Input: " + aVal + "\n\t" +
-					"Parsed: " + int);
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
+		var binC = new BinsonParser().parse(bufferC, 0);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		var bytesC = binC.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+		var parsedC = binC.get("a");
+		
+		if (typeof(parsedA) !== "number") {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
 		}
+		if (typeof(parsedB) !== "number") {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		if (typeof(parsedC) !== "number") {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		
+		if (a !== parsedA) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + a + "\n\t" +
+						"Parsed: " + parsedA);
+		}
+		if (b !== parsedB) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + b + "\n\t" +
+						"Parsed: " + parsedB);
+		}
+		if (c !== parsedC) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + c + "\n\t" +
+						"Parsed: " + parsedC);
+		}
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+		checkEquality(bytesC, expectedC);
 	};
 	
-	
-	
-	// Test for:
-	// i in [0xFFFF, 0x7FFF], except [0xFF7F, 0x007F]
 	this.testParseInt16 = function() {
-		var expected = [0x40, 0x14, 0x01, 0x61, 0x11, 0x34, 0x12, 0x41];
-		var b1 = new Binson();
-		var aName = "a";
-		var aVal = 0x1234;
-		b1.putInteger(aName, aVal);
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x11, 0x80, 0x00, 0x41];
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x11, 0x7F, 0xFF, 0x41];
+		var expectedC = [0x40, 0x14, 0x01, 0x61, 0x11, 0x00, 0x80, 0x41];
+		var expectedD = [0x40, 0x14, 0x01, 0x61, 0x11, 0xFF, 0x7F, 0x41];
 		
-		var b2 = Binson.parse(b1.toBytes());
-		var int = b2.get(aName);
+		var a = 128;
+		var b = -129;
+		var c = -32768;
+		var d = 32767;
+									
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
+		var bufferC = arrayToBuffer(expectedC);
+		var bufferD = arrayToBuffer(expectedD);
 		
-		if (int !== aVal) {
-			throw new Error("input integer does not match parsed integer. \n\t" +
-					"Input: " + aVal + "\n\t" +
-					"Parsed: " + int);
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
+		var binC = new BinsonParser().parse(bufferC, 0);
+		var binD = new BinsonParser().parse(bufferD, 0);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		var bytesC = binC.toBytes();
+		var bytesD = binD.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+		var parsedC = binC.get("a");
+		var parsedD = binD.get("a");
+		
+		if (typeof(parsedA) !== "number") {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
 		}
+		if (typeof(parsedB) !== "number") {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		if (typeof(parsedC) !== "number") {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		if (typeof(parsedD) !== "number") {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		
+		if (a !== parsedA) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + a + "\n\t" +
+						"Parsed: " + parsedA);
+		}
+		if (b !== parsedB) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + b + "\n\t" +
+						"Parsed: " + parsedB);
+		}
+		if (c !== parsedC) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + c + "\n\t" +
+						"Parsed: " + parsedC);
+		}
+		if (d !== parsedD) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + d + "\n\t" +
+						"Parsed: " + parsedD);
+		}
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+		checkEquality(bytesC, expectedC);
+		checkEquality(bytesD, expectedD);
 	};
 	
-	// Test for:
-	// i in [0xFFFFFFFF, 0x7FFFFFFF], except [0xFFFF7FFF, 0x0000FFFF]
 	this.testParseInt32 = function() {
-		var expected = [0x40, 0x14, 0x01, 0x61, 0x12, 0x78, 0x56, 0x34, 0x12, 0x41];
-		var b1 = new Binson();
-		var aName = "a";
-		var aVal = 0x12345678;
-		b1.putInteger(aName, aVal);
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x12, 0x00, 0x80, 0x00, 0x00, 0x41];
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x12, 0xFF, 0x7F, 0xFF, 0xFF, 0x41];
+		var expectedC = [0x40, 0x14, 0x01, 0x61, 0x12, 0x00, 0x00, 0x00, 0x80, 0x41];
+		var expectedD = [0x40, 0x14, 0x01, 0x61, 0x12, 0xFF, 0xFF, 0xFF, 0x7F, 0x41];
 		
-		var b2 = Binson.parse(b1.toBytes());
-		var int = b2.get(aName);
+		var a = 32768;
+		var b = -32769;
+		var c = -2147483648;
+		var d = 2147483647;
+									
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
+		var bufferC = arrayToBuffer(expectedC);
+		var bufferD = arrayToBuffer(expectedD);
 		
-		if (int !== aVal) {
-			throw new Error("input integer does not match parsed integer. \n\t" +
-					"Input: " + aVal + "\n\t" +
-					"Parsed: " + int);
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
+		var binC = new BinsonParser().parse(bufferC, 0);
+		var binD = new BinsonParser().parse(bufferD, 0);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		var bytesC = binC.toBytes();
+		var bytesD = binD.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+		var parsedC = binC.get("a");
+		var parsedD = binD.get("a");
+		
+		if (typeof(parsedA) !== "number") {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
 		}
+		if (typeof(parsedB) !== "number") {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		if (typeof(parsedC) !== "number") {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		if (typeof(parsedD) !== "number") {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		
+		if (a !== parsedA) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + a + "\n\t" +
+						"Parsed: " + parsedA);
+		}
+		if (b !== parsedB) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + b + "\n\t" +
+						"Parsed: " + parsedB);
+		}
+		if (c !== parsedC) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + c + "\n\t" +
+						"Parsed: " + parsedC);
+		}
+		if (d !== parsedD) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + d + "\n\t" +
+						"Parsed: " + parsedD);
+		}
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+		checkEquality(bytesC, expectedC);
+		checkEquality(bytesD, expectedD);
+	};
+	
+	this.testParseInt64Pos = function() {
+		// TODO: When there are 64-bit integers
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x13, 
+			0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x41];
+		var a = 2147483648;				
+		var bufferA = arrayToBuffer(expectedA);		
+		
+		// This call WILL throw an error
+		var binA = new BinsonParser().parse(bufferA, 0);
+	};
+	
+	this.testParseInt64Neg = function() {
+		// TODO: When there are 64-bit integers
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x13, 
+			0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0x41];
+		var a = -2147483649;				
+		var bufferA = arrayToBuffer(expectedA);		
+		
+		// This call WILL throw an error
+		var binA = new BinsonParser().parse(bufferA, 0);
 	};
 	
 	this.testParseIntRandom = function() {
 		var a1, a2, b1, b2;
-		var tests = 32;
+		var tests = 32;		// if tests > 32 we may get a 33-bit integer
 		
 		for (var i = 0; i < tests; i++) {
 			a1 = Math.floor((Math.random() * 2 * Math.pow(2, i)) - Math.pow(2, i));
@@ -885,5 +1281,1115 @@ function BinsonParserTest() {
 						"Parsed: " + a2);
 			}
 		}
+	};
+	
+	this.testParseDouble = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x46, 0xBA, 0x17, 0x06, 0x3d, 0x55, 0x55, 0x55, 0xBD, 0x41];
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x46, 0xB5, 0x69, 0xA5, 0xE6, 0x87, 0x95, 0x75, 0x40, 0x41];
+		
+		var a = -3.0316488E-13;		// 0xBD5555553D0617BA
+		var b = 345.3456789456789;	// 0x40759587E6A569B5
+									
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+		
+		
+		if (typeof(parsedA) !== "number") {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		if (typeof(parsedB) !== "number") {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		
+		if (a !== parsedA) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + a + "\n\t" +
+						"Parsed: " + parsedA);
+		}
+		if (b !== parsedB) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + b + "\n\t" +
+						"Parsed: " + parsedB);
+		}
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+	};
+	
+	this.testParseDoubleRandom = function() {
+		var a1, a2, b1, b2;
+		var tests = 100;
+		
+		for (var i = 0; i < tests; i++) {
+			a1 = Math.random() * Math.pow(2, i-25) - Math.pow(2, i-26);
+			b1 = new Binson().putDouble("a", a1);
+			b2 = Binson.parse(b1.toBytes());
+			a2 = b2.get("a");
+			
+			if (a1 !== a2) {
+				throw new Error("input double does not match parsed double. \n\t" +
+						"Input: " + a1 + "\n\t" + 
+						"Parsed: " + a2);
+			}
+		}  
+	};
+
+	this.testParseArrayEmpty = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 0x43, 0x41];
+		
+		var a = [];
+
+		var bufferA = arrayToBuffer(expectedA);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		
+		var bytesA = binA.toBytes();
+		var parsedA = binA.get("a");
+
+		if (!(Array.isArray(parsedA))) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		
+		if (a.length !== parsedA.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + a.length + "\n\t" +
+						"Parsed length: " + parsedA.length);
+		}
+		
+		for (var i = 0; i < a.length; i++) {
+			if (a[i] !== parsedA[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + a + "]\n\t" +
+							"Parsed: [" + parsedA + "]");
+			}
+		}
+		
+		checkEquality(bytesA, expectedA);
+	};
+	
+	this.testParseArrayBoolean = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 0x44, 0x43, 0x41];
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x42, 0x45, 0x43, 0x41];
+		
+		var a = [true];
+		var b = [false];
+
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+
+		if (!(Array.isArray(parsedA))) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		if (!(Array.isArray(parsedB))) {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		
+		if (a.length !== parsedA.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + a.length + "\n\t" +
+						"Parsed length: " + parsedA.length);
+		}
+		if (b.length !== parsedB.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + b.length + "\n\t" +
+						"Parsed length: " + parsedB.length);
+		}
+		
+		for (var i = 0; i < a.length; i++) {
+			if (a[i] !== parsedA[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + a + "]\n\t" +
+							"Parsed: [" + parsedA) + "]";
+			}
+		}
+		for (var i = 0; i < b.length; i++) {
+			if (b[i] !== parsedB[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + b + "]\n\t" +
+							"Parsed: [" + parsedB + "]");
+			}
+		}
+
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+	};
+	
+	this.testParseArrayInt8 = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 0x10, 0x00, 0x43, 0x41];
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x42, 0x10, 0x80, 0x43, 0x41];
+		var expectedC = [0x40, 0x14, 0x01, 0x61, 0x42, 0x10, 0x7F, 0x43, 0x41];
+		
+		var a = [0];
+		var b = [-128];
+		var c = [127];
+
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
+		var bufferC = arrayToBuffer(expectedC);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
+		var binC = new BinsonParser().parse(bufferC, 0);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		var bytesC = binC.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+		var parsedC = binC.get("a");
+
+		if (!(Array.isArray(parsedA))) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		if (!(Array.isArray(parsedB))) {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		if (!(Array.isArray(parsedC))) {
+			throw new Error("unexpected type, " + typeof(parsedC) + ", " + parsedC);
+		}
+		
+		if (a.length !== parsedA.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + a.length + "\n\t" +
+						"Parsed length: " + parsedA.length);
+		}
+		if (b.length !== parsedB.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + b.length + "\n\t" +
+						"Parsed length: " + parsedB.length);
+		}
+		if (c.length !== parsedC.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + c.length + "\n\t" +
+						"Parsed length: " + parsedC.length);
+		}
+		
+		for (var i = 0; i < a.length; i++) {
+			if (a[i] !== parsedA[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + a + "]\n\t" +
+							"Parsed: [" + parsedA) + "]";
+			}
+		}
+		for (var i = 0; i < b.length; i++) {
+			if (b[i] !== parsedB[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + b + "]\n\t" +
+							"Parsed: [" + parsedB + "]");
+			}
+		}
+		for (var i = 0; i < c.length; i++) {
+			if (c[i] !== parsedC[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + c + "]\n\t" +
+							"Parsed: [" + parsedC + "]");
+			}
+		}
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+		checkEquality(bytesC, expectedC);
+	};
+	
+	this.testParseArrayInt16 = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 0x11, 0x80, 0x00, 0x43, 0x41];
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x42, 0x11, 0x00, 0x80, 0x43, 0x41];
+		var expectedC = [0x40, 0x14, 0x01, 0x61, 0x42, 0x11, 0x7F, 0xFF, 0x43, 0x41];
+		var expectedD = [0x40, 0x14, 0x01, 0x61, 0x42, 0x11, 0xFF, 0x7F, 0x43, 0x41];
+		
+		var a = [128];
+		var b = [-32768];
+		var c = [-129];
+		var d = [32767];
+
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
+		var bufferC = arrayToBuffer(expectedC);
+		var bufferD = arrayToBuffer(expectedD);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
+		var binC = new BinsonParser().parse(bufferC, 0);
+		var binD = new BinsonParser().parse(bufferD, 0);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		var bytesC = binC.toBytes();
+		var bytesD = binD.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+		var parsedC = binC.get("a");
+		var parsedD = binD.get("a");
+
+		if (!(Array.isArray(parsedA))) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		if (!(Array.isArray(parsedB))) {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		if (!(Array.isArray(parsedC))) {
+			throw new Error("unexpected type, " + typeof(parsedC) + ", " + parsedC);
+		}
+		if (!(Array.isArray(parsedD))) {
+			throw new Error("unexpected type, " + typeof(parsedD) + ", " + parsedD);
+		}
+		
+		if (a.length !== parsedA.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + a.length + "\n\t" +
+						"Parsed length: " + parsedA.length);
+		}
+		if (b.length !== parsedB.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + b.length + "\n\t" +
+						"Parsed length: " + parsedB.length);
+		}
+		if (c.length !== parsedC.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + c.length + "\n\t" +
+						"Parsed length: " + parsedC.length);
+		}
+		if (d.length !== parsedD.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + d.length + "\n\t" +
+						"Parsed length: " + parsedD.length);
+		}
+		
+		for (var i = 0; i < a.length; i++) {
+			if (a[i] !== parsedA[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + a + "]\n\t" +
+							"Parsed: [" + parsedA) + "]";
+			}
+		}
+		for (var i = 0; i < b.length; i++) {
+			if (b[i] !== parsedB[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + b + "]\n\t" +
+							"Parsed: [" + parsedB + "]");
+			}
+		}
+		for (var i = 0; i < c.length; i++) {
+			if (c[i] !== parsedC[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + c + "]\n\t" +
+							"Parsed: [" + parsedC + "]");
+			}
+		}
+		for (var i = 0; i < c.length; i++) {
+			if (d[i] !== parsedD[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + d + "]\n\t" +
+							"Parsed: [" + parsedD + "]");
+			}
+		}
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+		checkEquality(bytesC, expectedC);
+		checkEquality(bytesD, expectedD);
+	};
+
+	this.testParseArrayInt32 = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 0x12, 0x00, 0x80, 0x00, 0x00, 0x43, 0x41];
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x42, 0x12, 0xFF, 0x7F, 0xFF, 0xFF, 0x43, 0x41];
+		var expectedC = [0x40, 0x14, 0x01, 0x61, 0x42, 0x12, 0x00, 0x00, 0x00, 0x80, 0x43, 0x41];
+		var expectedD = [0x40, 0x14, 0x01, 0x61, 0x42, 0x12, 0xFF, 0xFF, 0xFF, 0x7F, 0x43, 0x41];
+		
+		var a = [32768];
+		var b = [-32769];
+		var c = [-2147483648];
+		var d = [2147483647];
+
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
+		var bufferC = arrayToBuffer(expectedC);
+		var bufferD = arrayToBuffer(expectedD);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
+		var binC = new BinsonParser().parse(bufferC, 0);
+		var binD = new BinsonParser().parse(bufferD, 0);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		var bytesC = binC.toBytes();
+		var bytesD = binD.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+		var parsedC = binC.get("a");
+		var parsedD = binD.get("a");
+
+		if (!(Array.isArray(parsedA))) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		if (!(Array.isArray(parsedB))) {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		if (!(Array.isArray(parsedC))) {
+			throw new Error("unexpected type, " + typeof(parsedC) + ", " + parsedC);
+		}
+		if (!(Array.isArray(parsedD))) {
+			throw new Error("unexpected type, " + typeof(parsedD) + ", " + parsedD);
+		}
+		
+		if (a.length !== parsedA.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + a.length + "\n\t" +
+						"Parsed length: " + parsedA.length);
+		}
+		if (b.length !== parsedB.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + b.length + "\n\t" +
+						"Parsed length: " + parsedB.length);
+		}
+		if (c.length !== parsedC.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + c.length + "\n\t" +
+						"Parsed length: " + parsedC.length);
+		}
+		if (d.length !== parsedD.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + d.length + "\n\t" +
+						"Parsed length: " + parsedD.length);
+		}
+		
+		for (var i = 0; i < a.length; i++) {
+			if (a[i] !== parsedA[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + a + "]\n\t" +
+							"Parsed: [" + parsedA) + "]";
+			}
+		}
+		for (var i = 0; i < b.length; i++) {
+			if (b[i] !== parsedB[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + b + "]\n\t" +
+							"Parsed: [" + parsedB + "]");
+			}
+		}
+		for (var i = 0; i < c.length; i++) {
+			if (c[i] !== parsedC[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + c + "]\n\t" +
+							"Parsed: [" + parsedC + "]");
+			}
+		}
+		for (var i = 0; i < c.length; i++) {
+			if (d[i] !== parsedD[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + d + "]\n\t" +
+							"Parsed: [" + parsedD + "]");
+			}
+		}
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+		checkEquality(bytesC, expectedC);
+		checkEquality(bytesD, expectedD);
+	};
+	
+	this.testParseArrayInt64Pos = function() {
+		// TODO: When there are 64-bit integers
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 
+			0x13, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 
+			0x43, 0x41];
+		var a = 2147483648;				
+		var bufferA = arrayToBuffer(expectedA);		
+		
+		// This call WILL throw an error
+		var binA = new BinsonParser().parse(bufferA, 0);
+	};
+	
+	this.testParseArrayInt64Neg = function() {
+		// TODO: When there are 64-bit integers
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42,
+			0x13, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 
+			0x43, 0x41];
+		var a = -2147483649;				
+		var bufferA = arrayToBuffer(expectedA);		
+		
+		// This call WILL throw an error
+		var binA = new BinsonParser().parse(bufferA, 0);
+	};
+	
+	this.testParseArrayInts = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42,
+						0x10, 0x7F,						// int8		127
+						0x11, 0xFF, 0x7F,				// int16	32767
+						0x12, 0xFF, 0xFF, 0xFF, 0x7F,	// int32	2147483647
+						0x43, 0x41];
+
+		var a = [127, 32767, 2147483647];
+
+		var bufferA = arrayToBuffer(expectedA);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		
+		var bytesA = binA.toBytes();
+		
+		var parsedA = binA.get("a");
+
+		if (!(Array.isArray(parsedA))) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		
+		if (a.length !== parsedA.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + a.length + "\n\t" +
+						"Parsed length: " + parsedA.length);
+		}
+		
+		for (var i = 0; i < a.length; i++) {
+			if (a[i] !== parsedA[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + a + "]\n\t" +
+							"Parsed: [" + parsedA + "]");
+			}
+		}
+		
+		checkEquality(bytesA, expectedA);
+	};
+	
+	this.testParseArrayDouble = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 
+				0x46, 0xBA, 0x17, 0x06, 0x3d, 0x55, 0x55, 0x55, 0xBD, 
+				0x43, 0x41];
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x42,
+				0x46, 0xB5, 0x69, 0xA5, 0xE6, 0x87, 0x95, 0x75, 0x40, 
+				0x43, 0x41];
+		
+		var a = [-3.0316488E-13];		// 0xBD5555553D0617BA
+		var b = [345.3456789456789];	// 0x40759587E6A569B5
+
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+
+		if (!(Array.isArray(parsedA))) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		if (!(Array.isArray(parsedB))) {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		
+		if (a.length !== parsedA.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + a.length + "\n\t" +
+						"Parsed length: " + parsedA.length);
+		}
+		if (b.length !== parsedB.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + b.length + "\n\t" +
+						"Parsed length: " + parsedB.length);
+		}
+
+		
+		for (var i = 0; i < a.length; i++) {
+			if (a[i] !== parsedA[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + a + "]\n\t" +
+							"Parsed: [" + parsedA + "]");
+			}
+		}
+		for (var i = 0; i < b.length; i++) {
+			if (b[i] !== parsedB[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + b + "]\n\t" +
+							"Parsed: [" + parsedB + "]");
+			}
+		}
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+	};
+	
+	this.testParseArrayDoubles = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 
+						0x46, 0xBA, 0x17, 0x06, 0x3d, 0x55, 0x55, 0x55, 0xBD, 	// First double		-3.0316488E-13
+						0x46, 0xB5, 0x69, 0xA5, 0xE6, 0x87, 0x95, 0x75, 0x40,	// Second double	345.3456789456789
+						0x46, 0x18, 0x2D, 0x44, 0x54, 0xFB, 0x21, 0x09, 0x40,	// Third double		Math.PI (3.141592653589793)
+						0x43, 0x41];
+						
+		var a = [-3.0316488E-13, 345.3456789456789, Math.PI];
+
+		var bufferA = arrayToBuffer(expectedA);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		
+		var bytesA = binA.toBytes();
+		
+		var parsedA = binA.get("a");
+
+		if (!(Array.isArray(parsedA))) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		
+		if (a.length !== parsedA.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + a.length + "\n\t" +
+						"Parsed length: " + parsedA.length);
+		}
+		
+		for (var i = 0; i < a.length; i++) {
+			if (a[i] !== parsedA[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + a + "]\n\t" +
+							"Parsed: [" + parsedA + "]");
+			}
+		}
+		
+		checkEquality(bytesA, expectedA);
+	};
+	
+	this.testParseArrayString = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 0x14, 0x01, 0x62, 0x43, 0x41];
+		var a = ["b"];
+
+		var bufferA = arrayToBuffer(expectedA);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		
+		var bytesA = binA.toBytes();
+		
+		var parsedA = binA.get("a");
+
+		if (!(Array.isArray(parsedA))) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		
+		if (a.length !== parsedA.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + a.length + "\n\t" +
+						"Parsed length: " + parsedA.length);
+		}
+		
+		for (var i = 0; i < a.length; i++) {
+			if (a[i] !== parsedA[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + a + "]\n\t" +
+							"Parsed: [" + parsedA + "]");
+			}
+		}
+		
+		checkEquality(bytesA, expectedA);
+	};
+	
+	this.testParseArrayStringLong = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 0x15, 0x80, 0x00,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x43, 0x41];
+		
+		var str = "";
+		str += "12345678901234567890123456789012345678901234567890";
+		str += "12345678901234567890123456789012345678901234567890";
+		str += "1234567890123456789012345678";
+		
+		var a = [str];
+
+		var bufferA = arrayToBuffer(expectedA);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		
+		var bytesA = binA.toBytes();
+		
+		var parsedA = binA.get("a");
+
+		if (!(Array.isArray(parsedA))) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		
+		if (a.length !== parsedA.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + a.length + "\n\t" +
+						"Parsed length: " + parsedA.length);
+		}
+		
+		for (var i = 0; i < a.length; i++) {
+			if (a[i] !== parsedA[i]) {
+				throw new Error("unexpected value in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + a + "]\n\t" +
+							"Parsed: [" + parsedA + "]");
+			}
+		}
+		
+		checkEquality(bytesA, expectedA);
+	};
+	
+	this.testParseArrayObject = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 
+						0x40, 0x41, 
+						0x43, 0x41];
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x42, 
+						0x40, 0x14, 0x01, 0x61, 0x44, 0x41, 	// Binson object with a boolean field a = true
+						0x43, 0x41];
+		
+		var a = [new Binson()];
+		var b = [new Binson().putBoolean("a", true)];
+		
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
+		
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+
+		if (!(Array.isArray(parsedA))) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		if (!(Array.isArray(parsedB))) {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		
+		if (a.length !== parsedA.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + a.length + "\n\t" +
+						"Parsed length: " + parsedA.length);
+		}
+		if (b.length !== parsedB.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + b.length + "\n\t" +
+						"Parsed length: " + parsedB.length);
+		}
+			
+		for (var i = 0; i < a.length; i++) {
+			if (!(parsedA[i] instanceof Binson)) {
+				throw new Error("unexpected type in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + a + "]\n\t" +
+							"Parsed array: [" + parsedA + "]");
+			}
+		}
+		for (var i = 0; i < b.length; i++) {
+			if (!(parsedB[i] instanceof Binson)) {
+				throw new Error("unexpected type in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + b + "]\n\t" +
+							"Parsed array: [" + parsedB + "]");
+			}
+		}
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+		
+	};
+	
+	this.testParseArrayObjects = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42,
+						0x40, 0x41,									// Binson object without fields
+						0x40, 0x14, 0x01, 0x61, 0x44, 0x41,			// Binson object with a boolean field a = true
+						0x40, 0x14, 0x01, 0x62, 0x40, 0x41, 0x41,	// Binson object with a object field b, object without fields
+						0x43, 0x41];
+						
+		var a = [];
+		a.push(new Binson());
+		a.push(new Binson().putBoolean("a", true));
+		a.push(new Binson().putObject("b", new Binson()));
+		
+		var bufferA = arrayToBuffer(expectedA);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		
+		var bytesA = binA.toBytes();
+		
+		var parsedA = binA.get("a");
+		
+		if (!(Array.isArray(parsedA))) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		
+		if (a.length !== parsedA.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + a.length + "\n\t" +
+						"Parsed length: " + parsedA.length);
+		}
+			
+		for (var i = 0; i < a.length; i++) {
+			if (!(parsedA[i] instanceof Binson)) {
+				throw new Error("unexpected type in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + a + "]\n\t" +
+							"Parsed array: [" + parsedA + "]");
+			}
+		}
+		
+		checkEquality(bytesA, expectedA);
+		
+	};
+	
+	this.testParseArrayBytes = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 0x18, 0x04, 0x00, 0x00, 0x00, 0x00, 0x43, 0x41];
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x42, 0x18, 0x04, 0x00, 0x01, 0x02, 0x03, 0x43, 0x41];
+		
+		var aBuff = new ArrayBuffer(4);
+		var bBuff = new ArrayBuffer(4);
+		var u8 = new Uint8Array(bBuff);
+		u8[0] = 0;
+		u8[1] = 1;
+		u8[2] = 2;
+		u8[3] = 3;
+		
+		var a = [aBuff];
+		var b = [bBuff];
+		
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+		
+		if (!(Array.isArray(parsedA))) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		if (!(Array.isArray(parsedB))) {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		
+		if (a.length !== parsedA.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + a.length + "\n\t" +
+						"Parsed length: " + parsedA.length);
+		}
+		if (b.length !== parsedB.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + b.length + "\n\t" +
+						"Parsed length: " + parsedB.length);
+		}
+		
+		for (var i = 0; i < a.length; i++) {
+			if (!(parsedA[i] instanceof ArrayBuffer)) {
+				throw new Error("unexpected type in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + a + "]\n\t" +
+							"Parsed array: [" + parsedA + "]");
+			}
+		}
+		for (var i = 0; i < b.length; i++) {
+			if (!(parsedB[i] instanceof ArrayBuffer)) {
+				throw new Error("unexpected type in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + b + "]\n\t" +
+							"Parsed array: [" + parsedB + "]");
+			}
+		}
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+	};
+	
+	this.testParseArrayBytesLong = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 0x19, 0x80, 0x00, 
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x43, 0x41];
+		
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x42, 0x19, 0x80, 0x00, 
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+						0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x43, 0x41];
+						
+		var data = [0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30,
+					0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38];
+		
+		var aBuff = new ArrayBuffer(128);
+		var bBuff = new ArrayBuffer(128);
+		var u8 = new Uint8Array(bBuff);
+		
+		for (var i = 0; i < data.length; i++) {
+			u8[i] = data[i];
+		}
+		
+		var a = [aBuff];
+		var b = [bBuff];
+		
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+		
+		if (!(Array.isArray(parsedA))) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		if (!(Array.isArray(parsedB))) {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		
+		if (a.length !== parsedA.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + a.length + "\n\t" +
+						"Parsed length: " + parsedA.length);
+		}
+		if (b.length !== parsedB.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + b.length + "\n\t" +
+						"Parsed length: " + parsedB.length);
+		}
+		
+		for (var i = 0; i < a.length; i++) {
+			if (!(parsedA[i] instanceof ArrayBuffer)) {
+				throw new Error("unexpected type in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + a + "]\n\t" +
+							"Parsed array: [" + parsedA + "]");
+			}
+		}
+		for (var i = 0; i < b.length; i++) {
+			if (!(parsedB[i] instanceof ArrayBuffer)) {
+				throw new Error("unexpected type in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + b + "]\n\t" +
+							"Parsed array: [" + parsedB + "]");
+			}
+		}
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+	};
+	
+	this.testParseArrayNested = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 0x42, 0x43, 0x43, 0x41];
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x42, 0x42, 0x44, 0x45, 0x43, 0x43, 0x41];
+		
+		var a = [[]];
+		var b = [[true, false]];
+		
+		var bufferA = arrayToBuffer(expectedA);
+		var bufferB = arrayToBuffer(expectedB);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var binB = new BinsonParser().parse(bufferB, 0);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		
+		var parsedA = binA.get("a");
+		var parsedB = binB.get("a");
+		
+		if (!(Array.isArray(parsedA))) {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		if (!(Array.isArray(parsedB))) {
+			throw new Error("unexpected type, " + typeof(parsedB) + ", " + parsedB);
+		}
+		
+		if (a.length !== parsedA.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + a.length + "\n\t" +
+						"Parsed length: " + parsedA.length);
+		}
+		if (b.length !== parsedB.length) {
+			throw new Error("unexpected length.\n\t" +
+						"Expected length: " + b.length + "\n\t" +
+						"Parsed length: " + parsedB.length);
+		}
+		
+		for (var i = 0; i < b.length; i++) {
+			if (!(Array.isArray(parsedB[i]))) {
+				throw new Error("unexpected type in array.\n\t" +
+							"Position: " + i + "\n\t" +
+							"Expected: [" + b + "]\n\t" +
+							"Parsed array: [" + parsedB + "]");
+			}
+		}
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+	};
+	
+	this.testParseObjectEmpty = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x62, 0x40, 0x41, 0x41];
+						
+		var bufferA = arrayToBuffer(expectedA);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		
+		var bytesA = binA.toBytes();
+		
+		var parsedA = binA.get("b");
+		
+		if (!(parsedA instanceof Binson)) {
+			throw new Error("unexpected type. \n\t" + 
+						"Expected: Binson\n\t" +
+						"Parsed: " + parsedA);
+		}
+		
+		checkEquality(bytesA, expectedA);
+	};
+	
+	this.testParseObjectInteger = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x40, 0x14, 0x01, 0x61, 0x10, 0x00, 0x41, 0x41];
+						
+		var bufferA = arrayToBuffer(expectedA);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		
+		var bytesA = binA.toBytes();
+		
+		var parsedAbin = binA.get("a");
+		
+		if (!(parsedAbin instanceof Binson)) {
+			throw new Error("unexpected type. \n\t" + 
+						"Expected: Binson\n\t" +
+						"Parsed: " + parsedA);
+		}
+		
+		var parsedAbinInt = parsedAbin.get("a");
+		
+		if (typeof(parsedAbinInt) !== "number") {
+			throw new Error("unexpected type of inner field.\n\t" +
+						"Expected: number\n\t" + 
+						"Parsed: " + typeof(parsedAbinInt));
+		}
+		
+		if (parsedAbinInt !== 0) {
+			throw new Error("unexpected value of inner field.\n\t" +
+						"Expected: " + 0 + "\n\t" + 
+						"Parsed: " + parsedAbinInt);
+		}
+		
+		checkEquality(bytesA, expectedA);
+	};
+	
+	this.testParseEmptyObject = function() {
+		var expectedA = [0x40, 0x41];
+		
+		var bufferA = arrayToBuffer(expectedA);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+		
+		var bytesA = binA.toBytes();
+		
+		checkEquality(bytesA, expectedA);
+	};
+	
+	this.testParseOrdering = function() {
+		var expectedA = [0x40, 0x14, 0x02, 0x6B, 0x32, 0x14, 0x02, 0x76, 0x32, 
+						0x14, 0x03, 0x6B, 0x31, 0x32, 0x14, 0x02, 0x76, 0x31, 0x41];
+		
+		var bufferA = arrayToBuffer(expectedA);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
+	};
+	
+	this.testParseNameUnique = function() {
+		var expectedA = [0x40, 
+						0x14, 0x01, 0x61, 0x14, 0x01, 0x61, 		// a = "a"
+						0x14, 0x01, 0x61, 0x14, 0x02, 0x61, 0x62, 	// a = "ab"
+						0x14, 0x01, 0x62, 0x14, 0x01, 0x63,
+						0x41];
+		
+		var bufferA = arrayToBuffer(expectedA);
+		
+		var binA = new BinsonParser().parse(bufferA, 0);
 	};
 }
