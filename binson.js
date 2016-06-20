@@ -2,9 +2,10 @@
 // Binson implementation in JavaScript.
 // Authors: Frans Lundberg & Felix Grape
 //
-// 2016-06-17. Status: Not complete. Supports types: string, bytes, object, 
-//						boolean, integer, double, array. Does not support
-//						64-bit integers due to JavaScript limitations
+// 2016-06-20. 	Status: Complete. 
+//				Supports types: string, bytes, object, boolean, integer, double, array. 
+//
+//				Does not support 64-bit integers due to JavaScript limitations
 //
 //
 //
@@ -64,6 +65,8 @@ function Binson() {
 		return this;
 	};
 	
+	// All numbers are 64-bit floats. 
+	// binson.js can only handle 32-bit integers
 	this.putInteger = function(name, value) {
 		if (! Number.isInteger(value)) {
 			throw new Error("putInteger expected an integer");
@@ -112,7 +115,7 @@ function Binson() {
 		var size = this.byteSize();
 		
 		if (isNaN(size) || size < 2) {
-			throw new Error("bad size, " + size);
+			throw new Error("bad size: " + size);
 		}
 			   
 		var bytes = new DataView(new ArrayBuffer(size));
@@ -120,7 +123,9 @@ function Binson() {
 		var fieldNames = Object.keys(this.fields);
 		
 		if (bytes.byteLength != size) {
-			throw new Error("bytes has unexpected length, " + bytes.byteLength + ", " + size);
+			throw new Error("bytes has unexpected length.\n\t" + 
+					"Bytes.byteLength: " + bytes.byteLength + "\n\t" + 
+					"this.byteSize(): " + size);
 		}
 		
 		offset = this.pObjectToBytes(bytes, offset, this);
@@ -155,6 +160,7 @@ function Binson() {
 		return size;
 	};
 
+	// value = {type: <binson type>, value: <value>}
 	// value.type, value.value.
 	this.pValueToBytes = function(bytes, offset, value) {
 		switch (value.type) {
@@ -451,6 +457,7 @@ function Binson() {
 	// bytes instanceof ArrayBuffer  
 	this.pBytesSize = function(bytes) {
 		var len = bytes.byteLength;
+		// Bytes hex id + length integer + bytes
 		return 1 + this.pIntegerSize(len) + len;
 	};
 	
@@ -488,10 +495,10 @@ function Binson() {
 				size += 1;
 				break;
 			case "integer":
-				size += 1 + this.pIntegerSize(value.value); // int hex identifier + int8/16/32/64 size
+				size += 1 + this.pIntegerSize(value.value); // int hex id + int8/16/32/64 size
 				break;
 			case "double":
-				size += 1 + 8;					// double hex identifier + size of 64-bit float
+				size += 1 + 8;					// double hex id + size of 64-bit float
 				break;
 			case "array":
 				size += this.pArraySize(value.value);
@@ -565,7 +572,7 @@ function Binson() {
 		}
 	};
 	
-	// Returns the bytes of the binson as a string
+	// Returns the bytes of the binson object as a string
 	this.toString = function(){
 		var buffer = this.toBytes();
 		var uints = new Uint8Array(buffer);
