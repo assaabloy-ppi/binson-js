@@ -578,12 +578,13 @@ function Binson() {
 		var uints = new Uint8Array(buffer);
 		var res = "[";
 		for (var i = 0; i < uints.length-1; i++) {
-			if (uints[i] < 10) {
-				res += "0x0" + uints[i].toString(16) + ", ";
+			if (uints[i] < 16) { // 16 = 0x10
+				res += "0x0" + uints[i].toString(16).toUpperCase() + ", ";
 			} else {
-				res += "0x" + uints[i].toString(16) + ", ";
+				res += "0x" + uints[i].toString(16).toUpperCase() + ", ";
 			}
 		}
+		// Always 0x41, we don't need the if-statement
 		res += "0x" + uints[uints.length-1].toString(16) + "]";
 		return res;
 	};
