@@ -2,10 +2,11 @@
 // Binson implementation in JavaScript.
 // Authors: Frans Lundberg & Felix Grape
 //
-// 2016-06-20. 	Status: Complete. 
+// 2016-06-29. 	Status: Complete. 
 //				Supports types: string, bytes, object, boolean, integer, double, array. 
 //
-//				Does not support 64-bit integers due to JavaScript limitations
+//				Does not fully support 64-bit integers due to JavaScript limitations.
+//				Can parse positive integers smaller than 2^53-1
 //
 //
 //
@@ -744,13 +745,22 @@ function BinsonParser() {
 				// TODO: Get a 64-bit integer
 				// JavaScript only supports 53 bit integers
 				// binson.js only supports 32 bit integers
-				var bytes = "";
-				for (var i = 0; i < 8; i++) {
-					bytes += this.view.getUint8(this.offset).toString(16) + " ";
-					this.offset += 1;
+				result = this.pGet64BitInteger();
+				
+				// It's easy to represent positive 64-bit integers up
+				// to Number.MAX_SAFE_INTEGER so this will have to do
+				// in order to handle unix time in milliseconds
+				if ( 0 < result && result <= Number.MAX_SAFE_INTEGER ) {
+					this.offset += 8;
+				} else {
+					var bytes = "";
+					for (var i = 0; i < 8; i++) {
+						bytes += this.view.getUint8(this.offset).toString(16) + " ";
+						this.offset += 1;
+					}
+					throw new Error("JavaScript cannot handle 64-bit integers.\n\t" +
+						"Little-endian bytes: " + bytes);
 				}
-				throw new Error("JavaScript cannot handle 64-bit integers.\n\t" +
-					"Little-endian bytes: " + bytes);
 				break;
 				
 			default:
@@ -760,6 +770,21 @@ function BinsonParser() {
 		
 		return result;
 	}
+	
+	this.pGet64BitInteger = function() {
+		var res = 0;
+		var bytes = new Uint8Array(8);	// 64-bit is 8 bytes
+		for (var i = 0; i < 8; i++) {
+			bytes[i] = this.view.getUint8(this.offset + i);
+		}
+		if (bytes[7] > 127) {
+			return -1; // Sign bit is 1, can't do negative 64-bit integers
+		}
+		for (var i = 0; i < 8; i++) {
+			res += bytes[i] * Math.pow(2, 8*i) ;
+		}
+		return res;
+	};
 	
 	this.parseDouble = function() {
 		this.offset += 1;
