@@ -169,7 +169,7 @@ function Binson() {
 				offset = this.pStringToBytes(bytes, offset, value.value);
 				break;
 			case 'bytes':
-				offset = this.pBytesToBytes(bytes, offset, value.value);	// value.value is ArrayBuffer   TODO XXX
+				offset = this.pBytesToBytes(bytes, offset, value.value);
 				break;
 			case 'object':
 				offset = this.pObjectToBytes(bytes, offset, value.value);   
@@ -272,6 +272,25 @@ function Binson() {
 			
 		} else if (size == 8) {
 			// TODO: Handle 64-bit integers
+			// Currently stops too large integers in putInteger with
+			// pEnsureIntegerPrecision which only accepts negative integers
+			// that fit in 4 bytes and positive integers < Number.MAX_SAFE_INTEGER
+			bytes.setUint8(offset, 0x13);
+			offset += 1;
+			
+			for (let i = 0; i < size; i++) {
+				let byte = integer & 0xFF;
+				bytes.setUint8(offset, byte);
+				offset += 1;
+				
+				// Bitshift right 8 bits
+				for (let j = 0; j < 8; j++) {
+					if (integer & 1 === 1) {
+						integer -= 1;
+					}
+					integer = integer/2;
+				}
+			}
 		} else { 
 			throw new Error("this.pIntegerSize returned bad bytesize: " + size);
 		}
@@ -512,8 +531,12 @@ function Binson() {
 	// Integers that don't fit into 32-bit raises an error
 	this.pEnsureIntegerPrecision = function(integer) {
 		if (this.pIntegerSize(integer) > 4) {
-			throw new Error("specified integer does not fit in 32 bits.\n\t" +
-					"Integer: " + integer);
+			if (integer <= Number.MAX_SAFE_INTEGER && integer > 0) {
+				return;
+			} else {
+				throw new Error("specified integer does not fit in 32 bits.\n\t" +
+						"Integer: " + integer);
+			}
 		}
 	};
 	
@@ -580,12 +603,12 @@ function Binson() {
 		var res = "[";
 		for (var i = 0; i < uints.length-1; i++) {
 			if (uints[i] < 16) { // 16 = 0x10
-				res += "0x0" + uints[i].toString(16).toUpperCase() + ", ";
+				res += "0x0" + uints[i].toString(16).toLowerCase() + ", ";
 			} else {
-				res += "0x" + uints[i].toString(16).toUpperCase() + ", ";
+				res += "0x" + uints[i].toString(16).toLowerCase() + ", ";
 			}
 		}
-		// Always 0x41, we don't need the if-statement
+		// Always 0x41, we don't need the if-statement or toLowerCase
 		res += "0x" + uints[uints.length-1].toString(16) + "]";
 		return res;
 	};

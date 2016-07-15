@@ -38,6 +38,7 @@ function runBinsonTests() {
 		{name: "b.testInt8", f:b.testInt8},
 		{name: "b.testInt16", f:b.testInt16},
 		{name: "b.testInt32", f:b.testInt32},
+		{name: "b.testInt53", f:b.testInt53},
 		{name: "b.testInt64Pos", f:b.testInt64Pos},
 		{name: "b.testInt64Neg", f:b.testInt64Neg},
 		{name: "b.testIntDouble", f:b.testIntDouble},
@@ -389,6 +390,28 @@ function BinsonTest() {
 		checkEquality(bytesB, expectedB);
 		checkEquality(bytesC, expectedC);
 		checkEquality(bytesD, expectedD);
+	};
+	
+	this.testInt53 = function() {
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x13, 0x01, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x41];
+		var expectedB = [0x40, 0x14, 0x01, 0x61, 0x13, 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x1F, 0x00, 0x41];
+		var expectedC = [0x40, 0x14, 0x01, 0x61, 0x13, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x1F, 0x00, 0x41];
+		
+		var a = 2147483649;
+		var b = 9007199254740990; // Number.MAX_SAFE_INTEGER = 9007199254740991
+		var c = Number.MAX_SAFE_INTEGER;
+		
+		var binA = new Binson().putInteger("a", a);
+		var binB = new Binson().putInteger("a", b);
+		var binC = new Binson().putInteger("a", c);
+		
+		var bytesA = binA.toBytes();
+		var bytesB = binB.toBytes();
+		var bytesC = binC.toBytes();
+		
+		checkEquality(bytesA, expectedA);
+		checkEquality(bytesB, expectedB);
+		checkEquality(bytesC, expectedC);
 	};
 	
 	// Throws error! Only 32-bit integers are supported in binson.js
