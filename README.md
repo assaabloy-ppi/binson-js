@@ -14,9 +14,14 @@ Just include binson.js in your project. It has no dependencies.
 Status
 ======
 
-2016-06-20. This is work in progress. There is support for 
+2016-07-15. This is work in progress. There is support for 
 all Binson types except for 64-bit integers due to the fact
 that all numbers in JavaScript are 64-bit floats.
+
+There are however support for positive integers up to and including
+Number.MAX_SAFE_INTEGER (9007199254740991). It is possible to both
+input and parse integers up to that size. Negative numbers have to 
+fit in 32 bits.
 
 
 For binson-js developers
