@@ -792,7 +792,7 @@ function BinsonParser() {
 		}
 		
 		return result;
-	}
+	};
 	
 	this.pGet64BitInteger = function() {
 		var res = 0;
@@ -816,7 +816,7 @@ function BinsonParser() {
 		this.offset += 8;
 		
 		return result;
-	}
+	};
 	
 	this.parseArray = function() {
 		this.offset += 1;
@@ -835,7 +835,7 @@ function BinsonParser() {
 		
 		return array;
 		
-	}
+	};
 	
 	//
 	// Parses any type of value and returns it.
