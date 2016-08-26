@@ -29,61 +29,63 @@ testFunctionName - <number of tested> - <type (possibly with more details)> - <t
 ----------------------- END ----------------------- 
 
 
--------------- BYTES TESTS (2) ------------- 
+-------------- BYTES TESTS (3) ------------- 
 testBytes       - 2 - bytes     - [0x00, 0x00, 0x00, 0x00] & [0x00, 0x01, 0x02, 0x03]
 testBytesLong   - 2 - bytes     - 128 bytes [0x00, 0x00, ..., 0x00], and bitpattern from StringLong
 testBytesString - 1 - string    - tests putBytes("a", "a")
 ------------------- END -------------------- 
 
 
--------------- STRING TESTS (2) ------------- 
+-------------- STRING TESTS (3) ------------- 
 testString          - 1 - string    - "b"
 testStringLong      - 1 - string    - 128 characters "123456789012...012345678"
 testStringBoolean   - 1 - boolean   - tests putString("a", true)
 -------------------- END -------------------- 
 
 
--------------- BOOLEAN TESTS (1) ------------- 
+-------------- BOOLEAN TESTS (2) ------------- 
 testBoolean         - 2 - boolean   - both true and false
 testBooleanDouble   - 1 - double    - tests putDouble("a", Math.PI)
 --------------------- END -------------------- 
 
 
--------------- INTEGER TESTS (5) ------------- 
+-------------- INTEGER TESTS (7) ------------- 
 testInt8        - 3 - integer    - 127 (largest), -128 (smallest) and 0
 testInt16       - 4 - integer    - 128 (smallest+), -129 (largest-), 32767 (largest), -32768 (smallest)
 testInt32       - 4 - integer    - 32768 (smallest+), -32769(largest-), 2147483647 (largest), -2147483648 (smallest)
+testInt53       - 3 - integer    - 2147483649 (smallest+), 9007199254740990, 9007199254740991 (largest)
 testInt64Pos    - 1 - integer    - 2147483648 (smallest+) FAILS!
 testInt64Neg    - 1 - integer    - -2147483649 (biggest-) FAILS!
 testIntDouble   - 1 - double     - tests putInteger("a", Math.PI)
 -------------------- END -------------------- 
 
 
--------------- DOUBLE TESTS (1) ------------- 
+-------------- DOUBLE TESTS (2) ------------- 
 testDouble      - 2 - double    - both negative and positive
 testDoubleBytes - 1 - bytes     - tests putDouble("a", new ArrayBuffer(10))
 -------------------- END -------------------- 
 
 
--------------- ARRAY TESTS (17) --------------
-testArrayEmpty      - 1 - array                             - an empty array
-testArrayBoolean    - 2 - array containing one boolean      - same as testBoolean
-testArrayInt8       - 3 - array containing one int8         - same as testInt8
-testArrayInt16      - 4 - array containing one int16        - same as testInt16
-testArrayInt32      - 4 - array containing one int32        - same as testInt32
-testArrayInt64Pos   - 1 - try to put one int64              - same as testInt64Pos
-testArrayInt64Neg   - 1 - try to put one int64              - same as testInt64Neg
-testArrayInts       - 1 - array containing multiple ints    - of all sizes
-testArrayDouble     - 2 - array containing one double       - same as testDouble
-testArrayDoubles    - 1 - array containing multilpe doubles -
-testArrayString     - 1 - array containing one string       - same as testString
-testArrayStringLong - 1 - array containing one string       - same as testStringLong
-testArrayObject     - 2 - array containing one object       - one empty & one non-empty
-testArrayObjects    - 1 - array containing multiple objects - empty and non-empty
-testArrayBytes      - 2 - array containing one bytes        - same as testBytes
-testArrayBytesLong  - 2 - array containing one bytes        - same as testBytesLong
-testArrayNested     - 2 - array containing one array        - both empty and non-empty
-testArrayNull       - 1 - array containing a Null           -
+-------------- ARRAY TESTS (19) --------------
+testArrayEmpty            - 1 - array                             - an empty array
+testArrayBoolean          - 2 - array containing one boolean      - same as testBoolean
+testArrayInt8             - 3 - array containing one int8         - same as testInt8
+testArrayInt16            - 4 - array containing one int16        - same as testInt16
+testArrayInt32            - 4 - array containing one int32        - same as testInt32
+testArrayInt64Pos         - 1 - try to put one int64              - same as testInt64Pos
+testArrayInt64Neg         - 1 - try to put one int64              - same as testInt64Neg
+testArrayInts             - 1 - array containing multiple ints    - of all sizes
+testArrayDouble           - 2 - array containing one double       - same as testDouble
+testArrayDoubles          - 1 - array containing multilpe doubles -
+testArrayString           - 1 - array containing one string       - same as testString
+testArrayStringLong       - 1 - array containing one string       - same as testStringLong
+testArrayObject           - 2 - array containing one object       - one empty & one non-empty
+testArrayObjects          - 1 - array containing multiple objects - empty and non-empty
+testArrayBytes            - 2 - array containing one bytes        - same as testBytes
+testArrayBytesLong        - 2 - array containing one bytes        - same as testBytesLong
+testArrayNested           - 2 - array containing one array        - both empty and non-empty
+testArrayNull             - 1 - array containing a Null           -
+testArrayNestedUndefined  - 1 - nested array containing an undefined value
 -------------------- END -------------------- 
 
 
