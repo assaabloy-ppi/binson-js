@@ -7,14 +7,16 @@ data serialization format; see [binson.org](http://binson.org/).
 Status
 ======
 
-2016-07-15. This is work in progress. There is support for 
-all Binson types except for 64-bit integers due to the fact
-that all numbers in JavaScript are 64-bit floats.
+2016-08-26. Complete.
+There is support for all Binson types including integers up to 32-bit in size.
 
-There are however support for positive integers up to and including
-Number.MAX_SAFE_INTEGER (9007199254740991). It is possible to both
-input and parse integers up to that size. Negative numbers have to 
-fit in 32 bits.
+There is some support for 64 bit integers. In Javascript all numbers are are 
+64-bit floats. Therefore JavaScript have support for integers of size +/-2^53-1. 
+
+binson.js currently support positive integers up to and including 
+Number.MAX_SAFE_INTEGER (2^53-1). It is possible to use both putInteger
+and to parse integers up to that size. There is currently NO SUPPORT for negative 
+numbers that does not fit in 32 bits. 
 
 
 Usage
@@ -131,7 +133,7 @@ overwritten.
 
     Adds an integer field with the name and value as specified.
     Can currently handle values in the the range 
-    2,147,483,648 <= value <= 2^53-1
+    -2,147,483,648 <= value <= 2^53-1
     name - a string
     value - an integer number
     Throws Error if value is not an integer.
