@@ -176,6 +176,7 @@ Requirements
 
 * Readable code.
 * Extensive unit test suit.
+* BinsonTestCoverage.txt should detail the test coverage
 * Must work on recent Firefox and Chrome browsers.
 * Should work on most smart phone browsers.
 * Should work on most tablet computers.
