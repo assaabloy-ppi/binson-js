@@ -31,40 +31,37 @@ The Binson specification states that field names has to be unique. Therefore
 if you try to add a second field with the same name the first field will be
 overwritten.
 
-new Binson();
--------------
+#### new Binson();
 
     Returns a new Binson object.
     Example:
         var bin = new Binson();
 
-Binson.parse(buffer, offset);
------------------------------
+#### Binson.parse(buffer, offset);
 
     Tries to parse an arraybuffer as a Binson object. The 
     parameter offset specifies where in the buffer the Binson
     object starts.
+    buffer - an ArrayBuffer
+    offset - an integer
     Throws Error if parsing could not complete.
     Example:
         var buff = getArrayBuffer();
         var bin = Binson.parse(buff);
 
-toBytes();
-----------
+#### toBytes();
 
     Returns the Binson object as an ArrayBuffer.
     Example:
         var buff = bin.toBytes();
 
-byteSize();
------------
+#### byteSize();
 
     Returns the size of the ArrayBuffer returned by toBytes();
     Example:
         var size = bin.byteSize();
 
-toString();
------------
+#### toString();
 
     Returns a string representation of the Binson object. The 
     string is on the form "[byte1, byte2, ..., byteN]" where 
@@ -74,20 +71,21 @@ toString();
     Example:
         var hexString = bin.toString();
 
-get(name);
-----------
+#### get(name);
 
     Returns the value with the specified name. Similar to the 
     get of a Java HashMap. Returns undefined if the Binson object
     does not have a field with the specified name.
+    name - a string
     Example: 
         var name = bin.get("name");
         var string = "The authors name is " + name;
 
-putString(name, value);
------------------------
+#### putString(name, value);
 
     Adds a string field with the name and value as specified. 
+    name - a string
+    value - a string
     Throws Error if value is not a string.
     Example:
         var bin = new Binson().putString("a", "a");
@@ -95,10 +93,11 @@ putString(name, value);
         bin.putString("a", "A");
         var bigA = bin.get("a");    // "A"
 
-putBytes(name, value);
-----------------------
+#### putBytes(name, value);
 
-    Adds a byte field with the name and value as specified. 
+    Adds a byte field with the name and value as specified.
+    name - a string
+    value - an ArrayBuffer
     Throws Error if value is not an ArrayBuffer.
     Example:
         var bin = new Binson();
@@ -106,32 +105,35 @@ putBytes(name, value);
         var buff = u8s.buffer;
         bin.putBytes(name, buff);
 
-putObject(name, value);
------------------------
+#### putObject(name, value);
 
     Adds a Binson field with the name and value as specified.
+    name - a string
+    value - a Binson object
     Throws Error if value is not a Binson object.
     Example:
         var bin = new Binson();
         var innerBin = new Binson();
         bin.putObject(name, innerBin);
 
-putBoolean(name, value);
-------------------------
+#### putBoolean(name, value);
 
     Adds a boolean field with the name and value as specified.
+    name - a string
+    value - a boolean
     Throws Error if value is not a boolean.
     Example:
         var bin = new Binson();
         var bool = true;
         bin.putBoolean(name, bool);
     
-putInteger(name, value);
-------------------------
+#### putInteger(name, value);
 
     Adds an integer field with the name and value as specified.
     Can currently handle values in the the range 
     2,147,483,648 <= value <= 2^53-1
+    name - a string
+    value - an integer number
     Throws Error if value is not an integer.
     Throws Error if value is not in the range specified above.
     Example:
@@ -139,20 +141,22 @@ putInteger(name, value);
         var value = 235;
         bin.putInteger(name, value);
 
-putDouble(name, value);
------------------------
+#### putDouble(name, value);
 
     Adds a double field with the name and value as specified.
+    name - a string
+    value - a number
     Throws Error if value is not a number.
     Example:
         var bin = new Binson();
         var value = 3.14;
         bin.putDouble(name, vaue);
     
-putArray(name, value);
-----------------------
+#### putArray(name, value);
 
     Adds an array field with the name and value as specified.
+    name - a string
+    value - an array
     Throws Error if value is not an array.
     Example:
         var bin = new Binson();
