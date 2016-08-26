@@ -11,38 +11,48 @@ Usage
 Just include binson.js in your project. It has no dependencies.
 
 Public Functions
-----------------
+================
 
 See binson-test.js for more detailed examples of how to use binson.js
 
+The Binson specification states that field names has to be unique. Therefore
+if you try to add a second field with the same name the first field will be
+overwritten.
+
 new Binson();
+-------------
 
     Returns a new Binson object.
     Example:
         var bin = new Binson();
 
 Binson.parse(buffer, offset);
+-----------------------------
 
     Tries to parse an arraybuffer as a Binson object. The 
     parameter offset specifies where in the buffer the Binson
     object starts.
+    Throws Error if parsing could not complete.
     Example:
         var buff = getArrayBuffer();
         var bin = Binson.parse(buff);
 
 toBytes();
+----------
 
     Returns the Binson object as an ArrayBuffer.
     Example:
         var buff = bin.toBytes();
 
 byteSize();
+-----------
 
     Returns the size of the ArrayBuffer returned by toBytes();
     Example:
         var size = bin.byteSize();
 
 toString();
+-----------
 
     Returns a string representation of the Binson object. The 
     string is on the form "[byte1, byte2, ..., byteN]" where 
@@ -53,6 +63,7 @@ toString();
         var hexString = bin.toString();
 
 get(name);
+----------
 
     Returns the value with the specified name. Similar to the 
     get of a Java HashMap. Returns undefined if the Binson object
@@ -61,10 +72,8 @@ get(name);
         var name = bin.get("name");
         var string = "The authors name is " + name;
 
-The following holds for ALL put functions. If there already exists 
-a field with the same name it will be overwritten.
-
 putString(name, value);
+-----------------------
 
     Adds a string field with the name and value as specified. 
     Throws Error if value is not a string.
@@ -75,6 +84,7 @@ putString(name, value);
         var bigA = bin.get("a");    // "A"
 
 putBytes(name, value);
+----------------------
 
     Adds a byte field with the name and value as specified. 
     Throws Error if value is not an ArrayBuffer.
@@ -85,6 +95,7 @@ putBytes(name, value);
         bin.putBytes(name, buff);
 
 putObject(name, value);
+-----------------------
 
     Adds a Binson field with the name and value as specified.
     Throws Error if value is not a Binson object.
@@ -94,6 +105,7 @@ putObject(name, value);
         bin.putObject(name, innerBin);
 
 putBoolean(name, value);
+------------------------
 
     Adds a boolean field with the name and value as specified.
     Throws Error if value is not a boolean.
@@ -103,6 +115,7 @@ putBoolean(name, value);
         bin.putBoolean(name, bool);
     
 putInteger(name, value);
+------------------------
 
     Adds an integer field with the name and value as specified.
     Can currently handle values in the the range 
@@ -115,6 +128,7 @@ putInteger(name, value);
         bin.putInteger(name, value);
 
 putDouble(name, value);
+-----------------------
 
     Adds a double field with the name and value as specified.
     Throws Error if value is not a number.
@@ -124,6 +138,7 @@ putDouble(name, value);
         bin.putDouble(name, vaue);
     
 putArray(name, value);
+----------------------
 
     Adds an array field with the name and value as specified.
     Throws Error if value is not an array.
