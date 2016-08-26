@@ -61,7 +61,7 @@ testIntDouble	- 1 - double	- tests putInteger("a", Math.PI)
 
 -------------- DOUBLE TESTS (1) ------------- 
 testDouble		- 2 - double	- both negative and positive
-testDoubleBytes	- 1 - bytes		- tests putDouble("a", new ArrayBuffer(10))
+testDoubleBytes	- 1 - bytes	- tests putDouble("a", new ArrayBuffer(10))
 -------------------- END -------------------- 
 
 
@@ -155,14 +155,14 @@ testParseInt32			- 4 	- integer - integer as testInt32
 testParseInt64Pos		- 1 	- integer - integer as testInt64Pos, FAILS!
 testParseInt64Neg		- 1		- integer - integer as testInt64Neg, FAILS!
 testParseIntRandom		- 32 	- integer - uses putInteger, not predef array, pos and neg,
-								Pr[all integer types are tested] = very close to 1
+											Pr[all integer types are tested] = very close to 1
 -------------------- END -------------------- 
 
 
 -------------- DOUBLE TESTS (2) --------------
 testParseDouble				- 2		- double - double as testDouble
 testParseDoubleRandom		- 100	- double - uses putDouble not predefined array,
-									pos and neg, from ~1e-10 to ~1e20
+										pos and neg, from ~1e-10 to ~1e20
 -------------------- END -------------------- 
 
 
