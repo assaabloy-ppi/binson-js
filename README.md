@@ -10,6 +10,126 @@ Usage
 
 Just include binson.js in your project. It has no dependencies.
 
+Public Functions
+----------------
+
+See binson-test.js for more detailed examples of how to use binson.js
+
+* new Binson();
+    Returns a new Binson object.
+Example:
+    var bin = new Binson();
+
+* Binson.parse(buffer, offset);
+    Tries to parse an arraybuffer as a Binson object. The 
+    parameter offset specifies where in the buffer the Binson
+    object starts.
+Example:
+    var buff = getArrayBuffer();
+    var bin = Binson.parse(buff);
+
+* toBytes();
+    Returns the Binson object as an ArrayBuffer.
+Example:
+    var buff = bin.toBytes();
+
+* byteSize();
+    Returns the size of the ArrayBuffer returned by toBytes();
+Example:
+    var size = bin.byteSize();
+
+* toString();
+    Returns a string representation of the Binson object. The 
+    string is on the form "[byte1, byte2, ..., byteN]" where 
+    byteI is on the form 0xQQ where QQ is a two digit 
+    hexadecimal number.
+    
+    This function is first and foremost useful for Binson developers.
+Example:
+    var hexString = bin.toString();
+
+* get(name);
+    Returns the value with the specified name. Similar to the 
+    get of a Java HashMap. Returns undefined if the Binson object
+    does not have a field with the specified name.
+Example: 
+    var name = bin.get("name");
+    var string = "The authors name is " + name;
+
+The following holds for ALL put functions. If there already exists 
+a field with the same name it will be overwritten.
+
+* putString(name, value);
+    Adds a string field with the name and value as specified. 
+
+    Throws Error if value is not a string.
+Example:
+    var bin = new Binson().putString("a", "a");
+    var smallA = bin.get("a");  // "a"
+    bin.putString("a", "A");
+    var bigA = bin.get("a");    // "A"
+
+* putBytes(name, value);
+    Adds a byte field with the name and value as specified. 
+
+    Throws Error if value is not an ArrayBuffer.
+Example:
+    var bin = new Binson();
+    var u8s = getMyUint8Array();
+    var buff = u8s.buffer;
+    bin.putBytes(name, buff);
+
+* putObject(name, value);
+    Adds a Binson field with the name and value as specified.
+
+    Throws Error if value is not a Binson object.
+Example:
+    var bin = new Binson();
+    var innerBin = new Binson();
+    bin.putObject(name, innerBin);
+
+* putBoolean(name, value);
+    Adds a boolean field with the name and value as specified.
+
+    Throws Error if value is not a boolean.
+Example:
+    var bin = new Binson();
+    var bool = true;
+    bin.putBoolean(name, bool);
+    
+* putInteger(name, value);
+    Adds an integer field with the name and value as specified.
+    Can currently handle values in the the range 
+    2,147,483,648 <= value <= 2^53-1
+
+    2^53-1 is 9007199254740991 and it is the largest integer JavaScript
+    can accurately represent.
+
+    Throws Error if value is not an integer.
+    Throws Error if value is not in the range specified above.
+Example:
+    var bin = new Binson();
+    var value = 235;
+    bin.putInteger(name, value);
+
+* putDouble(name, value);
+    Adds a double field with the name and value as specified.
+
+    Throws Error if value is not a number.
+Example:
+    var bin = new Binson();
+    var value = 3.14;
+    bin.putDouble(name, vaue);
+    
+* putArray(name, value);
+    Adds an array field with the name and value as specified.
+
+    Throws Error if value is not an array.
+Example:
+    var bin = new Binson();
+    var value = [new Binson, 12, "Hello", true];
+    bin.putArray(name, value);
+
 
 Status
 ======
