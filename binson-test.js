@@ -85,6 +85,7 @@ function runBinsonTests() {
 		{name: "p.testParseInt8", f:p.testParseInt8},
 		{name: "p.testParseInt16", f:p.testParseInt16},
 		{name: "p.testParseInt32", f:p.testParseInt32},
+		{name: "p.testParseInt53", f:p.testParseInt53},
 		{name: "p.testParseInt64Pos", f:p.testParseInt64Pos},
 		{name: "p.testParseInt64Neg", f:p.testParseInt64Neg},
 		{name: "p.testParseIntRandom", f:p.testParseIntRandom},
@@ -173,6 +174,26 @@ function BinsonTest() {
 		
 		checkEquality(bytesA, expectedA);
 		checkEquality(bytesB, expectedB);
+		
+		if (binA.hasBytes("a")) {
+			var res = binA.getBytes("a");
+		} else {
+			throw new Error("Field a not found");
+		}
+		
+		if (binA.hasBytes("B")) {
+			throw new Error("Field B found");
+		}
+		
+		if (binB.hasBytes("a")) {
+			var res = binB.getBytes("a");
+		} else {
+			throw new Error("Field a not found");
+		}
+		
+		if (binB.hasBytes("B")) {
+			throw new Error("Field B found");
+		}
 	};
 	
 	this.testBytesLong = function() {
@@ -241,7 +262,15 @@ function BinsonTest() {
 	
 	// Throws error! Putting a string with putBytes should not work!
 	this.testBytesString = function() {
-		new Binson().putBytes("a", "a");
+		var exception = false;
+		try {
+			new Binson().putBytes("a", "a");
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to put string with putBytes");
+		}
 	};
 	
 	this.testString = function() {
@@ -250,6 +279,19 @@ function BinsonTest() {
 		var bytes = b.toBytes();
 		
 		checkEquality(bytes, expected);
+		
+		if (b.hasString("a")) {
+			var res = b.getString("a");
+			if (res !== "b") {
+				throw new Error("Field value not as expected");
+			}
+		} else {
+			throw new Error("Field a not found");
+		}
+		
+		if (b.hasString("B")) {
+			throw new Error("Field B found");
+		}
 	};
 	
 	this.testStringLong = function() {
@@ -281,7 +323,15 @@ function BinsonTest() {
 	
 	// Throws error! Putting a boolean with putString should not work!
 	this.testStringBoolean = function() {
-		new Binson().putString("a", true);
+		var exception = false;
+		try {
+			new Binson().putString("a", true);
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to put boolean with putString");
+		}
 	};
 	
 	this.testBoolean = function() {
@@ -296,11 +346,32 @@ function BinsonTest() {
 		
 		checkEquality(bytesA, expectedA);
 		checkEquality(bytesB, expectedB);
+		
+		if (binA.hasBoolean("a")) {
+			var res = binA.getBoolean("a");
+			if (res !== true) {
+				throw new Error("Field value not as expected");
+			}
+		} else {
+			throw new Error("Field a not found");
+		}
+		
+		if (binA.hasBoolean("B")) {
+			throw new Error("Field B found");
+		}
 	};
 	
 	// Throws error! Putting a double with putBoolean should not work!
 	this.testBooleanDouble = function() {
-		new Binson().putBoolean("a", Math.PI);
+		var exception = false;
+		try {
+			new Binson().putBoolean("a", Math.PI);
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to put double with putBoolean");
+		}
 	};
 	
 	// Test edge cases: (bitpatterns are big-endian)
@@ -327,6 +398,19 @@ function BinsonTest() {
 		checkEquality(bytesA, expectedA);
 		checkEquality(bytesB, expectedB);
 		checkEquality(bytesC, expectedC);
+		
+		if (binA.hasInteger("a")) {
+			var res = binA.getInteger("a");
+			if (res !== a) {
+				throw new Error("Field value not as expected");
+			}
+		} else {
+			throw new Error("Field a not found");
+		}
+		
+		if (binA.hasInteger("B")) {
+			throw new Error("Field B found");
+		}
 	};
 	
 	// Test edge cases:	(bitpatterns and hex are big-endian)
@@ -414,26 +498,44 @@ function BinsonTest() {
 		checkEquality(bytesC, expectedC);
 	};
 	
-	// Throws error! Only 32-bit integers are supported in binson.js
 	this.testInt64Pos = function() {
-		// TODO: When 64-bit integers work
-		var a = 2147483648;
-		// This call _WILL_ throw a new Error
-		var bin = new Binson().putInteger("a", a);
+		var exception = false;
+		try {
+			new Binson().putInteger("a", 9223372036854775807);
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to put 2^63-1 with putInteger");
+		}		
 	};
 	
 	// Throws error! Only 32-bit integers are supported in binson.js
 	this.testInt64Neg = function() {
-		// TODO: When 64-bit integers work
-		var a = -2147483649;
-		// This call _WILL_ throw a new Error
-		var bin = new Binson().putInteger("a", a);
+		var exception = false;
+		try {
+			new Binson().putInteger("a", -9223372036854775808);
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to put -2^63 with putInteger");
+		}
 	};
 	
 	// Throws error! You can only put integers with putInteger
 	this.testIntDouble = function() {
-		new Binson().putInteger("a", Math.PI);
-	}
+		var exception = false;
+		try {
+			new Binson().putInteger("a", Math.PI);
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to put double with putInteger");
+		}
+		
+	};
 	
 	// See http://www.exploringbinary.com/floating-point-converter/
 	// in order to generate bitpatterns for 64-bit floats
@@ -452,12 +554,34 @@ function BinsonTest() {
 		
 		checkEquality(bytesA, expectedA);
 		checkEquality(bytesB, expectedB);
+		
+		if (binA.hasDouble("a")) {
+			var res = binA.getDouble("a");
+			if (res !== a) {
+				throw new Error("Field value not as expected");
+			}
+		} else {
+			throw new Error("Field a not found");
+		}
+		
+		if (binA.hasDouble("B")) {
+			throw new Error("Field B found");
+		}
 	};
 	
 	// Throws error! Putting an ArrayBuffer with putDouble should not work
 	this.testDoubleBytes = function() {
-		new Binson().putDouble("a", new ArrayBuffer(10));
-	}
+		var exception = false;
+		try {
+			new Binson().putDouble("a", new ArrayBuffer(10));
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to put array with putDouble");
+		}
+		
+	};
 	
 	this.testArrayEmpty = function() {
 		var expected = [0x40, 0x14, 0x01, 0x61, 0x42, 0x43, 0x41];
@@ -468,6 +592,17 @@ function BinsonTest() {
 		var bytes = b.toBytes();
 		
 		checkEquality(bytes, expected);
+		
+		if (b.hasArray("a")) {
+			var res = b.getArray("a");
+			
+		} else {
+			throw new Error("Field a not found");
+		}
+		
+		if (b.hasArray("B")) {
+			throw new Error("Field B found");
+		}
 	};
 	
 	this.testArrayBoolean = function() {
@@ -565,18 +700,28 @@ function BinsonTest() {
 	
 	// Throws error! Binson.js cannot handle 64-bit integers
 	this.testArrayInt64Pos = function() {
-		// TODO: When 64-bit integers work
-		var a = [2147483648];
-		// This call _WILL_ throw a new Error
-		var bin = new Binson().putArray("a", a);
+		var exception = false;
+		try {
+			new Binson().putArray("a", [9223372036854775807]);
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to put 64 bit integer in array");
+		}
 	};
 	
 	// Throws error! Binson.js cannot handle 64-bit integers
 	this.testArrayInt64Neg = function() {
-		// TODO: When 64-bit integers work
-		var a = [-2147483649];
-		// This call _WILL_ throw a new Error
-		var bin = new Binson().putArray("a", a);
+		var exception = false;
+		try {
+			new Binson().putArray("a", [-9223372036854775807]);
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to put 64 bit integer in array");
+		}
 	};
 	
 	this.testArrayInts = function() {
@@ -818,14 +963,30 @@ function BinsonTest() {
 	
 	// Throws error! Binson does not support null.
 	this.testArrayNull = function() {
-		new Binson().putArray("a", [1, 2, null, 3]);
-	}
+		var exception = false;
+		try {
+			new Binson().putArray("a", [1, 2, null, 3]);
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to put null element in array");
+		}
+	};
 	
 	// Throws error! Undefined is an invalid array element
 	this.testArrayNestedUndefined = function() {
 		// arr[1][1][2] = undefined
-		new Binson().putArray("a", [true, [Math.PI, [0, 0, undefined]], false, [1,[],new Binson()]]);
-	}
+		var exception = false;
+		try {
+			new Binson().putArray("a", [true, [Math.PI, [0, 0, undefined]], false, [1,[],new Binson()]]);
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to put undefined element in nested array");
+		}
+	};
 	
 	this.testObjectEmpty = function() {
 		var a = new Binson().putObject("b", new Binson());
@@ -1275,16 +1436,40 @@ function BinsonParserTest() {
 		checkEquality(bytesD, expectedD);
 	};
 	
-	// Throws error! 64-bit integers are not implemented!
+	this.testParseInt53 = function() {
+		var a = Number.MAX_SAFE_INTEGER;
+		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x13, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x1F, 0x00, 0x41];
+		var bufferA = arrayToBuffer(expectedA);
+		var binA = new BinsonParser().parse(bufferA, 0);
+		var bytesA = binA.toBytes();
+		var parsedA = binA.getInteger("a");
+		if (typeof(parsedA) !== "number") {
+			throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
+		}
+		if (a !== parsedA) {
+			throw new Error("unexpected value.\n\t" +
+						"Expected: " + a + "\n\t" +
+						"Parsed: " + parsedA);
+		}
+	};
+	
 	this.testParseInt64Pos = function() {
 		// TODO: When there are 64-bit integers
 		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x13, 
-			0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x41];
-		var a = 2147483648;				
+			0x00, 0x00, 0x00, 0x80, 0x81, 0x00, 0x00, 0x01, 0x41];
+		var a = 8070451082003742720;				
 		var bufferA = arrayToBuffer(expectedA);		
-		
-		// This call WILL throw an error
-		var binA = new BinsonParser().parse(bufferA, 0);
+		var bin;
+		var exception = false;
+		try {
+			bin = new BinsonParser().parse(bufferA, 0);
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			console.log(bin.getInteger("a"));
+			throw new Error("Able to parse 64 bit integer");
+		}
 	};
 	
 	// Throws error! 64-bit integers are not implemented!
@@ -1295,8 +1480,15 @@ function BinsonParserTest() {
 		var a = -2147483649;				
 		var bufferA = arrayToBuffer(expectedA);		
 		
-		// This call WILL throw an error
-		var binA = new BinsonParser().parse(bufferA, 0);
+		var exception = false;
+		try {
+			new BinsonParser().parse(bufferA, 0);
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to put 64 bit integer");
+		}
 	};
 	
 	/*
@@ -1329,7 +1521,7 @@ function BinsonParserTest() {
 			a1 = Math.floor((Math.random() * 2 * Math.pow(2, i)) - Math.pow(2, i));
 			b1 = new Binson().putInteger("a", a1);
 			b2 = Binson.parse(b1.toBytes());
-			a2 = b2.get("a");
+			a2 = b2.getInteger("a");
 			
 			if (a1 !== a2) {
 				throw new Error("input integer does not match parsed integer. \n\t" +
@@ -1783,14 +1975,22 @@ function BinsonParserTest() {
 	// Throws error! 64-bit integers are not implemented! 
 	this.testParseArrayInt64Pos = function() {
 		// TODO: When there are 64-bit integers
+		//10 1F FF FF FF FF FF FF
 		var expectedA = [0x40, 0x14, 0x01, 0x61, 0x42, 
-			0x13, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 
+			0x13, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x1F, 0x10, 
 			0x43, 0x41];
-		var a = 2147483648;				
+		var a = 1161928703861587967;				
 		var bufferA = arrayToBuffer(expectedA);		
 		
-		// This call WILL throw an error
-		var binA = new BinsonParser().parse(bufferA, 0);
+		var exception = false;
+		try {
+			new BinsonParser().parse(bufferA, 0);
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to parse 64 bit integer element in array");
+		}
 	};
 	
 	// Throws error! 64-bit integers are not implemented!
@@ -1802,8 +2002,15 @@ function BinsonParserTest() {
 		var a = -2147483649;				
 		var bufferA = arrayToBuffer(expectedA);		
 		
-		// This call WILL throw an error
-		var binA = new BinsonParser().parse(bufferA, 0);
+		var exception = false;
+		try {
+			new BinsonParser().parse(bufferA, 0);
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to put undefined element in array");
+		}
 	};
 	
 	this.testParseArrayInts = function() {
@@ -2441,7 +2648,15 @@ function BinsonParserTest() {
 		
 		var bufferA = arrayToBuffer(expectedA);
 		
-		var binA = new BinsonParser().parse(bufferA, 0);
+		var exception = false;
+		try {
+			new BinsonParser().parse(bufferA, 0);
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to put boolean with putString");
+		}
 	};
 	
 	// Throws error!
@@ -2455,6 +2670,14 @@ function BinsonParserTest() {
 		
 		var bufferA = arrayToBuffer(expectedA);
 		
-		var binA = new BinsonParser().parse(bufferA, 0);
+		var exception = false;
+		try {
+			new BinsonParser().parse(bufferA, 0);
+		} catch (err) {
+			exception = true;
+		}
+		if (!exception) {
+			throw new Error("Able to put boolean with putString");
+		}
 	};
 }
