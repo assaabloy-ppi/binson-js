@@ -33,6 +33,8 @@ function Binson() {
 	
 	this.fields = {};
 	
+	
+	// STRING
 	this.putString = function(name, value) {
 		if (!(typeof(value) === "string")) {
 			throw new Error("putString expected string");
@@ -41,6 +43,31 @@ function Binson() {
 		return this;
 	};
 	
+	this.getString = function(name) {
+		var f = this.fields[name];
+		if (f === undefined) {
+			return undefined;
+		} else if (f.type !== "string") {
+			return undefined;
+		} 
+		return f.value;
+	};
+	
+	this.hasString = function(name) {
+		var f = this.fields[name];
+		if (f === undefined) {
+			return false;
+		} else if (f.type !== "string") {
+			return false;
+		} 
+		return true;
+	};
+	
+	
+	
+	
+	
+	// BYTES
 	// ArrayBuffer value.
 	this.putBytes = function(name, value) {
 		if (!(value instanceof ArrayBuffer)) {
@@ -50,6 +77,30 @@ function Binson() {
 		return this;
 	};
 	
+	this.getBytes = function(name) {
+		var f = this.fields[name];
+		if (f === undefined) {
+			return undefined;
+		} else if (f.type !== "bytes") {
+			return undefined;
+		} 
+		return f.value;
+	};
+	
+	this.hasBytes = function(name) {
+		var f = this.fields[name];
+		if (f === undefined) {
+			return false;
+		} else if (f.type !== "bytes") {
+			return false;
+		} 
+		return true;
+	};
+	
+	
+	
+	
+	// BINSON OBJECT
 	this.putObject = function(name, value) {
 		if (!(value instanceof Binson)) {
 			throw new Error("putObject expected a Binson object");
@@ -58,6 +109,30 @@ function Binson() {
 		return this;
 	};
 	
+	this.getObject = function(name) {
+		var f = this.fields[name];
+		if (f === undefined) {
+			return undefined;
+		} else if (f.type !== "object") {
+			return undefined;
+		} 
+		return f.value;
+	};
+	
+	this.hasObject = function(name) {
+		var f = this.fields[name];
+		if (f === undefined) {
+			return false;
+		} else if (f.type !== "object") {
+			return false;
+		} 
+		return true;
+	};
+	
+	
+	
+	
+	// BOOLEAN
 	this.putBoolean = function(name, value) {
 		if (!(typeof(value) === "boolean")) {
 			throw new Error("putBoolean expected a boolean");
@@ -66,6 +141,30 @@ function Binson() {
 		return this;
 	};
 	
+	this.getBoolean = function(name) {
+		var f = this.fields[name];
+		if (f === undefined) {
+			return undefined;
+		} else if (f.type !== "boolean") {
+			return undefined;
+		} 
+		return f.value;
+	};
+	
+	this.hasBoolean = function(name) {
+		var f = this.fields[name];
+		if (f === undefined) {
+			return false;
+		} else if (f.type !== "boolean") {
+			return false;
+		} 
+		return true;
+	};
+	
+	
+	
+	
+	// INTEGER
 	// All numbers are 64-bit floats. 
 	// binson.js can only handle 32-bit integers
 	this.putInteger = function(name, value) {
@@ -77,6 +176,30 @@ function Binson() {
 		return this;
 	};
 	
+	this.getInteger = function(name) {
+		var f = this.fields[name];
+		if (f === undefined) {
+			return undefined;
+		} else if (f.type !== "integer") {
+			return undefined;
+		} 
+		return f.value;
+	};
+	
+	this.hasInteger = function(name) {
+		var f = this.fields[name];
+		if (f === undefined) {
+			return false;
+		} else if (f.type !== "integer") {
+			return false;
+		} 
+		return true;
+	};
+	
+	
+	
+	
+	// DOUBLE
 	this.putDouble = function(name, value) {
 		if (!(typeof(value) === "number")) {
 			throw new Error("putDouble expected a number");
@@ -85,6 +208,30 @@ function Binson() {
 		return this;
 	};
 	
+	this.getDouble = function(name) {
+		var f = this.fields[name];
+		if (f === undefined) {
+			return undefined;
+		} else if (f.type !== "double") {
+			return undefined;
+		} 
+		return f.value;
+	};
+	
+	this.hasDouble = function(name) {
+		var f = this.fields[name];
+		if (f === undefined) {
+			return false;
+		} else if (f.type !== "double") {
+			return false;
+		} 
+		return true;
+	};
+	
+	
+	
+	
+	// ARRAY
 	this.putArray = function(name, value) {
 		if (!(Array.isArray(value))) {
 			throw new Error("putArray expected an array");
@@ -94,10 +241,31 @@ function Binson() {
 		return this;
 	};
 	
-	this.pPut = function(type, name, value) {
-		this.fields[name] = {type:type, value:value};
-		return this;
+	this.getArray = function(name) {
+		var f = this.fields[name];
+		if (f === undefined) {
+			return undefined;
+		} else if (f.type !== "array") {
+			return undefined;
+		} 
+		return f.value;
 	};
+	
+	this.hasArray = function(name) {
+		var f = this.fields[name];
+		if (f === undefined) {
+			return false;
+		} else if (f.type !== "array") {
+			return false;
+		} 
+		return true;
+	};
+	
+	
+	
+	
+	
+	
 	
 	// Returns value given its name
 	this.get = function(name) {
@@ -107,6 +275,11 @@ function Binson() {
 		} else {
 			return f.value;
 		}
+	};
+	
+	this.pPut = function(type, name, value) {
+		this.fields[name] = {type:type, value:value};
+		return this;
 	};
 	
 	/**
@@ -800,8 +973,11 @@ function BinsonParser() {
 		for (var i = 0; i < 8; i++) {
 			bytes[i] = this.view.getUint8(this.offset + i);
 		}
-		if (bytes[7] > 127) {
-			return -1; // Sign bit is 1, can't do negative 64-bit integers
+		// MAX_SAFE_INTEGER is 00 1F FF FF FF FF FF FF
+		// So highest byte must be 0 and second highest
+		// byte must be strictly smaller than 31
+		if (bytes[7] !== 0 || bytes[6] > 31) {
+			return -1;  
 		}
 		for (var i = 0; i < 8; i++) {
 			res += bytes[i] * Math.pow(2, 8*i) ;
