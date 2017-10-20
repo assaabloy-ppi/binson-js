@@ -63,11 +63,11 @@ Creating Binson objects
 Binson objects are creating using the constructor. The constructor
 will always be called with the **new** keyword regardless of usage.
 
-        var bin1 = new Binson()
-        var bin2 = Binson()
+    var bin1 = new Binson()
+    var bin2 = Binson()
 
-        console.log(bin1 instanceof Binson) // true
-        console.log(bin2 instanceof Binson) // true
+    console.log(bin1 instanceof Binson) // true
+    console.log(bin2 instanceof Binson) // true
 
 Serializing Binson objects
 --------------------------
