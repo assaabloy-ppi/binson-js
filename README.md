@@ -1,188 +1,289 @@
 binson-js
 =========
 
-A JavaScript library implementing Binson. Binson is an exceptionally simple 
+A JavaScript library implementing Binson. Binson is an exceptionally simple
 data serialization format; see [binson.org](http://binson.org/).
+
+Table of Contents
+=================
+* [Status](#status)
+* [Usage](#usage)
+  * [Adding binson-js to your project](#adding-binson-js-to-your-project)
+  * [Creating Binson objects](#creating-binson-objects)
+  * [Serializing Binson objects](#serializing-binson-objects)
+  * [Deserializing Binson objects](#deserializing-binson-objects)
+  * [Getting the byte size of Binson objects](#getting-the-byte-size-of-binson-objects)
+  * [Adding or replacing field values](#adding-or-replacing-field-values)
+  * [Getting field values](#getting-field-values)
+  * [Checking for field existance](#checking-for-field-existance)
+  * [Getting a hex string](#getting-a-hex-string)
+  * [Getting a human readable string](#getting-a-human-readable-string)
+* [For binson-js developers](#for-binson-js-developers)
+  * [Requirements](#requirements)
+  * [GIT repo](#git-repo)
+
 
 Status
 ======
 
+2017-10-19. Update to use module.exports. Use public domain lib to do UTF-8 encoding and decoding.
+
 2016-08-26. Complete.
 There is support for all Binson types including integers up to 32-bit in size.
 
-There is some support for 64 bit integers. In Javascript all numbers are are 
-64-bit floats. Therefore JavaScript have support for integers of size +/-2^53-1. 
+There is some support for 64 bit integers. In Javascript all numbers are are
+64-bit floats. Therefore JavaScript have support for integers of size +/-2^53-1.
 
-binson.js currently support positive integers up to and including 
+binson.js currently support positive integers up to and including
 Number.MAX_SAFE_INTEGER (2^53-1). It is possible to use both putInteger
-and to parse integers up to that size. There is currently NO SUPPORT for negative 
-numbers that does not fit in 32 bits. 
-
+and to parse integers up to that size. There is currently NO SUPPORT for negative
+numbers that does not fit in 32 bits.
 
 Usage
 =====
 
-Just include binson.js in your project. It has no dependencies.
+Adding binson-js to your project
+--------------------------------
 
-Public Functions
-================
+Include js/src and js/lib folders in your project and include binson using require
 
-See binson-test.js for more detailed examples of how to use binson.js
+    var Binson = require('./path/to/binson.js')
+
+See js/src-test/ for more detailed examples of how to use binson.js
 
 The Binson specification states that field names has to be unique. Therefore
 if you try to add a second field with the same name the first field will be
 overwritten.
 
-#### new Binson();
+Creating Binson objects
+-----------------------
 
-    Returns a new Binson object.
-    Example:
-        var bin = new Binson();
+#### new Binson() or Binson()
 
-#### Binson.parse(buffer, offset);
+Binson objects are creating using the constructor. The constructor
+will always be called with the **new** keyword regardless of usage.
 
-    Tries to parse an arraybuffer as a Binson object. The 
-    parameter offset specifies where in the buffer the Binson
-    object starts.
-    buffer - an ArrayBuffer
-    offset - an integer
-    Throws Error if parsing could not complete.
-    Example:
-        var buff = getArrayBuffer();
-        var bin = Binson.parse(buff);
+        var bin1 = new Binson()
+        var bin2 = Binson()
 
-#### toBytes();
+        console.log(bin1 instanceof Binson) // true
+        console.log(bin2 instanceof Binson) // true
 
-    Returns the Binson object as an ArrayBuffer.
-    Example:
-        var buff = bin.toBytes();
+Serializing Binson objects
+--------------------------
 
-#### byteSize();
+#### object.toBytes()
 
-    Returns the size of the ArrayBuffer returned by toBytes();
-    Example:
-        var size = bin.byteSize();
+Returns an ArrayBuffer with a serialized Binson object.
 
-#### toString();
+    var bin = new Binson().putString("aField", "aValue")
+    var buff = bin.toBytes()
 
-    Returns a string representation of the Binson object. The 
-    string is on the form "[byte1, byte2, ..., byteN]" where 
-    byteI is on the form 0xQQ where QQ is a two digit 
-    hexadecimal number.
-    This function is first and foremost useful for Binson developers.
-    Example:
-        var hexString = bin.toString();
+Deserializing Binson objects
+----------------------------
 
-#### get(name);
+#### Binson.parse(buffer [, offset])
 
-    Returns the value with the specified name. Similar to the 
-    get of a Java HashMap. Returns undefined if the Binson object
-    does not have a field with the specified name.
-    name - a string
-    Example: 
-        var name = bin.get("name");
-        var string = "The authors name is " + name;
+Returns a Binson object. The offset argument is optional, if omitted
+parsing starts at the beginning of the ArrayBuffer. Throws an error
+if the buffer could not be parsed.
+
+    var bin = Binson.parse(buff)
+    var bin = Binson.parse(buff, offset)
+
+
+Getting the byte size of Binson objects
+---------------------------------------
+
+#### object.byteSize()
+
+Returns the size of the resulting ArrayBuffer of a serialized Binson object
+
+    var sizeInBytes = bin.byteSize();
+
+
+Adding or replacing field values
+--------------------------------
+
+To add a new field or replace an existing field in a
+Binson object there are a set of put-methods. The
+put-methods are type checked, which means that trying
+to store an integer using putString will thrown an
+error. The put-methods take two parameters, a field name
+and a value. If a field with the specified name already
+exists in the Binson object the field value is replaced.
 
 #### putString(name, value);
 
-    Adds a string field with the name and value as specified. 
-    name - a string
-    value - a string
-    Throws Error if value is not a string.
-    Example:
-        var bin = new Binson().putString("a", "a");
-        var smallA = bin.get("a");  // "a"
-        bin.putString("a", "A");
-        var bigA = bin.get("a");    // "A"
+    var bin = new Binson().putString("a", "a");
+    var smallA = bin.get("a");  // "a"
+    bin.putString("a", "A");
+    var bigA = bin.get("a");    // "A"
 
 #### putBytes(name, value);
 
-    Adds a byte field with the name and value as specified.
-    name - a string
-    value - an ArrayBuffer
-    Throws Error if value is not an ArrayBuffer.
-    Example:
-        var bin = new Binson();
-        var u8s = getMyUint8Array();
-        var buff = u8s.buffer;
-        bin.putBytes(name, buff);
+    var bin = new Binson();
+    var buff = getMyArrayBuffer();
+    bin.putBytes("buffer", buff);
 
 #### putObject(name, value);
 
-    Adds a Binson field with the name and value as specified.
-    name - a string
-    value - a Binson object
-    Throws Error if value is not a Binson object.
-    Example:
-        var bin = new Binson();
-        var innerBin = new Binson();
-        bin.putObject(name, innerBin);
+    var bin = new Binson();
+    var innerBin = new Binson();
+    bin.putObject("bin", innerBin);
 
 #### putBoolean(name, value);
 
-    Adds a boolean field with the name and value as specified.
-    name - a string
-    value - a boolean
-    Throws Error if value is not a boolean.
-    Example:
-        var bin = new Binson();
-        var bool = true;
-        bin.putBoolean(name, bool);
-    
+    var bin = new Binson();
+    var bool = true;
+    bin.putBoolean("trueOrFalse", bool);
+
 #### putInteger(name, value);
 
-    Adds an integer field with the name and value as specified.
-    Can currently handle values in the the range 
-    -2,147,483,648 <= value <= 2^53-1
-    name - a string
-    value - an integer number
-    Throws Error if value is not an integer.
-    Throws Error if value is not in the range specified above.
-    Example:
-        var bin = new Binson();
-        var value = 235;
-        bin.putInteger(name, value);
+binson-js can currently handle integer values in the the
+range [-2^31, 2^53-1] instead of the full range [-2^63, 2^63-1]
+because of how numbers are represented in JavaScript. putInteger
+throws an error if the integer is not within the valid range.
+
+    var bin = new Binson();
+    var value = 235;
+    bin.putInteger("number", value);
 
 #### putDouble(name, value);
 
-    Adds a double field with the name and value as specified.
-    name - a string
-    value - a number
-    Throws Error if value is not a number.
-    Example:
-        var bin = new Binson();
-        var value = 3.14;
-        bin.putDouble(name, vaue);
-    
+    var bin = new Binson();
+    var value = 3.14;
+    bin.putDouble("pi", vaue);
+
 #### putArray(name, value);
 
-    Adds an array field with the name and value as specified.
-    name - a string
-    value - an array
-    Throws Error if value is not an array.
-    Example:
-        var bin = new Binson();
-        var value = [new Binson, 12, "Hello", true];
-        bin.putArray(name, value);
+When adding an array every element of the array is typecheked recursively
 
+    var bin = new Binson();
+    var value = [new Binson, 12, "Hello", true];
+    bin.putArray("array", value);
+
+Getting field values
+--------------------
+
+For every put-method there is a corresponding get-method,
+and in addition to this there is one get-method that is
+not type checked. All get-methods returns undefined if
+no field with the specified name. The typechecked get-methods
+returns undefined if there is no field of the requested type.
+
+#### object.get(name)
+
+It is possible to get the value of a field without any typechecking
+
+    var bin = getAuthorBin()
+    var name = bin.get("name")
+    var string = "The authors name is " + name
+
+#### object.getString(name)
+
+    var bin = getAuthorBin()
+    var name = bin.getString("name")
+    var string = "The authors name is " + name
+
+#### object.getBytes(name)
+
+    var bin = getAuthorBin()
+    var pubkey = bin.getBytes("pubkey")
+    var string = "The authors public key is " + bytes2string(pubkey)
+
+#### object.getObject(name)
+
+    var bin = getAuthorBin()
+    var adress = bin.getObject("adress")
+    var string = "The author lives on " + adress.getString("street")
+
+#### object.getBoolean(name)
+
+    var bin = getAuthorBin()
+    var alive = bin.getBoolean("alive")
+    var string = "The author is " + (alive ? "alive" : "dead")
+
+#### object.getInteger(name)
+
+    var bin = getAuthorBin()
+    var birthyear = bin.getAge("birthyear")
+    var string = "The author was born in " + birthyear
+
+#### object.getDouble(name)
+
+    var bin = getAuthorBin()
+    var height = bin.getDouble("height")
+    var string = "The authors height is " + height
+
+#### object.getArray(name)
+
+    var bin = getAuthorBin()
+    var books = bin.getArray("books")
+    var string = "The authors first book was " + books[0]
+
+Checking for field existance
+----------------------------
+
+Every get-method has a corresponding has-method that returns true or false
+depending on if the corresponding get-method would return undefined or not.
+If get would return *undefined* has returns *false*, otherwise has returns *true*.
+
+    var bin = getAuthorBin()
+    var name = bin.getString("name")
+    if (bin.hasString("penName")) {
+        name = bin.getString("penName")
+    }
+    var str = "The authors name is " + name
+
+
+Getting a hex string
+--------------------
+
+#### object.hex()
+
+Returns the Binson object as a hex string on the form
+"[byte1, byte2, ..., byteN]", where byteI is on the
+form 0xQQ where Q is a hexadecimal digit.
+
+    var bin = new Binson().putString("a")
+    console.log(bin.hex())  // [0x40, 0x14, 0x01, 0x61, 0x14, 0x01, 0x61, 0x41]
+
+Getting a human readable string
+-------------------------------
+
+#### object.toBinsonString()
+
+Returns the Binson object as a human readable string.
+
+    var bin = new Binson().putInteger("a", 4711).putArray("b", [7, true])
+    console.log(bin.toBinsonString())
+    //  {
+    //    a := 4711,
+    //    b := [
+    //      7,
+    //      true
+    //    ]
+    //  }
 
 
 For binson-js developers
 ========================
 
-View binson-test.html in your browser to run the tests. Enable the 
-web console to see the output.
+To run the tests
+
+    node js/src-test/tests.js
 
 Requirements
 ------------
 
 * Readable code.
-* Extensive unit test suit.
+* Extensive unit test suite.
 * BinsonTestCoverage.txt should detail the test coverage
 * Must work on recent Firefox and Chrome browsers.
 * Should work on most smart phone browsers.
 * Should work on most tablet computers.
-
+* Must work with node.js
 
 GIT Repo
 --------

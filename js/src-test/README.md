@@ -3,11 +3,11 @@
 
     1. The byte sequence must follow the format of the ABNF rule object.
     2. Values must be stored using as few bytes as possible.
-    3. Fields must be stored in order. The order must be the lexicographical 
+    3. Fields must be stored in order. The order must be the lexicographical
         order of the [UTF-8] bytes of the name of the fields.
     4. Two fields of the same object cannot have the same name.
     5. Little-endian byte-order must be used.
-    
+
     From: http://binson.org/ on 2016-06-20
 
     VALUE TYPE TESTS tests properties 1, 2 & 5.
@@ -19,37 +19,38 @@
 
 ============ VALUE TYPE TESTS ============
 
-    Tests putting a single field. Test 
-    functions that tests multiple values 
-    does this by creating multiple 
+    Tests putting a single field. Test
+    functions that tests multiple values
+    does this by creating multiple
     Binson objects, one for each test case.
 
------- <VALUE TYPE TESTED> TESTS <(#test functions)> ------- 
+------ <VALUE TYPE TESTED> TESTS <(#test functions)> -------
 testFunctionName - <number of tested> - <type (possibly with more details)> - <test specific info>
------------------------ END ----------------------- 
+----------------------- END -----------------------
 
 
--------------- BYTES TESTS (3) ------------- 
+-------------- BYTES TESTS (3) -------------
 testBytes       - 2 - bytes     - [0x00, 0x00, 0x00, 0x00] & [0x00, 0x01, 0x02, 0x03]
 testBytesLong   - 2 - bytes     - 128 bytes [0x00, 0x00, ..., 0x00], and bitpattern from StringLong
 testBytesString - 1 - string    - tests putBytes("a", "a")
-------------------- END -------------------- 
+------------------- END --------------------
 
 
--------------- STRING TESTS (3) ------------- 
+-------------- STRING TESTS (4) -------------
 testString          - 1 - string    - "b"
+testStringEmoji     - 1 - string    - "😂"
 testStringLong      - 1 - string    - 128 characters "123456789012...012345678"
 testStringBoolean   - 1 - boolean   - tests putString("a", true)
--------------------- END -------------------- 
+-------------------- END --------------------
 
 
--------------- BOOLEAN TESTS (2) ------------- 
+-------------- BOOLEAN TESTS (2) -------------
 testBoolean         - 2 - boolean   - both true and false
 testBooleanDouble   - 1 - double    - tests putDouble("a", Math.PI)
---------------------- END -------------------- 
+--------------------- END --------------------
 
 
--------------- INTEGER TESTS (7) ------------- 
+-------------- INTEGER TESTS (7) -------------
 testInt8        - 3 - integer    - 127 (largest), -128 (smallest) and 0
 testInt16       - 4 - integer    - 128 (smallest+), -129 (largest-), 32767 (largest), -32768 (smallest)
 testInt32       - 4 - integer    - 32768 (smallest+), -32769(largest-), 2147483647 (largest), -2147483648 (smallest)
@@ -57,13 +58,13 @@ testInt53       - 3 - integer    - 2147483649 (smallest+), 9007199254740990, 900
 testInt64Pos    - 1 - integer    - 2147483648 (smallest+) FAILS!
 testInt64Neg    - 1 - integer    - -2147483649 (biggest-) FAILS!
 testIntDouble   - 1 - double     - tests putInteger("a", Math.PI)
--------------------- END -------------------- 
+-------------------- END --------------------
 
 
--------------- DOUBLE TESTS (2) ------------- 
+-------------- DOUBLE TESTS (2) -------------
 testDouble      - 2 - double    - both negative and positive
 testDoubleBytes - 1 - bytes     - tests putDouble("a", new ArrayBuffer(10))
--------------------- END -------------------- 
+-------------------- END --------------------
 
 
 -------------- ARRAY TESTS (19) --------------
@@ -86,7 +87,7 @@ testArrayBytesLong        - 2 - array containing one bytes        - same as test
 testArrayNested           - 2 - array containing one array        - both empty and non-empty
 testArrayNull             - 1 - array containing a Null           -
 testArrayNestedUndefined  - 1 - nested array containing an undefined value
--------------------- END -------------------- 
+-------------------- END --------------------
 
 
 -------------- OBJECT TESTS (2) -------------
@@ -102,7 +103,7 @@ ______________________________________________
 
 testEmptyObject     - Property 1:   Empty object is created and written to bytes properly
 
-testOrdering        - Property 3:   The field ordering is verified by adding fields 
+testOrdering        - Property 3:   The field ordering is verified by adding fields
                                     out of order and then verifying that toBytes()
                                     writes the fields in lexicographical order.
 
@@ -118,36 +119,37 @@ testNameUnique     - Property 4:    Puts a boolean field a = true and then an in
 
 ============ VALUE TYPE TESTS ============
 
-    Tests input a predefined ArrayBuffer 
+    Tests input a predefined ArrayBuffer
     to parser. The field names are fetched
-    with the get method and compared 
+    with the get method and compared
     with the expected value. Each parsed
     Binson object only contains one field.
 
-    Test functions that tests multiple 
-    values does this by creating multiple 
+    Test functions that tests multiple
+    values does this by creating multiple
     Binson objects, one for each test case.
 
------- <VALUE TYPE TESTED> TESTS <(#tests)> ------- 
+------ <VALUE TYPE TESTED> TESTS <(#tests)> -------
 testFunctionName - <number of tested> - <object/array info> - <test specific info>
------------------------ END ----------------------- 
+----------------------- END -----------------------
 
 
--------------- BYTES TESTS (2) ------------- 
+-------------- BYTES TESTS (2) -------------
 testParseBytes          - 2    - bytes    - bytes as testBytes
 testParseBytesLong      - 2    - bytes    - bytes as testBytesLong
-------------------- END ------------------- 
+------------------- END -------------------
 
 
--------------- STRING TESTS (2) -------------
+-------------- STRING TESTS (3) -------------
 testParseString        - 1  - string    - string as testString
+testParseStringEmoji   - 1  - string    - string as testStringEmoji
 testParseStringLong    - 1  - string    - string as testStringLong
--------------------- END ------------------- 
+-------------------- END -------------------
 
 
--------------- BOOLEAN TESTS (1) ------------- 
+-------------- BOOLEAN TESTS (1) -------------
 testParseBoolean       - 2  - boolean - boolean as testBoolean
---------------------- END ------------------- 
+--------------------- END -------------------
 
 
 -------------- INTEGER TESTS (6) -------------
@@ -158,14 +160,14 @@ testParseInt64Pos    - 1    - integer - integer as testInt64Pos, FAILS!
 testParseInt64Neg    - 1    - integer - integer as testInt64Neg, FAILS!
 testParseIntRandom   - 32   - integer - uses putInteger, not predef array, pos and neg,
                                         Pr[all integer types are tested] = very close to 1
--------------------- END -------------------- 
+-------------------- END --------------------
 
 
 -------------- DOUBLE TESTS (2) --------------
 testParseDouble        - 2    - double - double as testDouble
 testParseDoubleRandom  - 100  - double - uses putDouble not predefined array,
                                          pos and neg, from ~1e-10 to ~1e20
--------------------- END -------------------- 
+-------------------- END --------------------
 
 
 -------------- ARRAY TESTS (17) ---------------
@@ -185,8 +187,8 @@ testParseArrayObject       - 2 - array containing one object       - as testArra
 testParseArrayObjects      - 1 - array containing multiple objects - as testArrayObjects
 testParseArrayBytes        - 2 - array containing one bytes        - as testArrayBytes
 testParseArrayBytesLong    - 2 - array containing one bytes        - as testArrayBytesLong
-testParseArrayNested       - 2 - array containing one array        - as testArrayNested 
--------------------- END -------------------- 
+testParseArrayNested       - 2 - array containing one array        - as testArrayNested
+-------------------- END --------------------
 
 
 -------------- OBJECT TESTS (2) --------------
@@ -198,12 +200,12 @@ testParseObjectInteger      - 1 - object    - same as testObjectInteger
 
 testParseEmptyObject    - Property 1:    Empty object is created and written to bytes
 
-testParseOrdering       - Property 3:    The field ordering is verified by trying to parse an 
-                                            ArrayBuffer of a Binson object where the fields are 
+testParseOrdering       - Property 3:    The field ordering is verified by trying to parse an
+                                            ArrayBuffer of a Binson object where the fields are
                                             not stored in lexicographical order. FAILS!
 
 testParseNameUnique     - Property 4:    The uniqueness of names is verified by trying to parse
-                                            an ArrayBuffer of a Binson object containing two 
+                                            an ArrayBuffer of a Binson object containing two
                                             fields with the same name. FAILS!
 
 ========== END OBJECT PROPERTY TESTS =========
