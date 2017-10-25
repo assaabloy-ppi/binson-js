@@ -1,3 +1,4 @@
 # Local comments, not in remote repo.
 *.local.txt
 
+/.project

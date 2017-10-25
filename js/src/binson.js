@@ -835,6 +835,9 @@ module.exports = Binson
 //
 
 function parse(buffer, offset) {
+	if (!(buffer instanceof ArrayBuffer)) {
+		throw new TypeError('Can only parse ArrayBuffer')
+	}
 
 	let view = new DataView(buffer)
 	return parseObject()
