@@ -55,8 +55,8 @@ testInt8        - 3 - integer    - 127 (largest), -128 (smallest) and 0
 testInt16       - 4 - integer    - 128 (smallest+), -129 (largest-), 32767 (largest), -32768 (smallest)
 testInt32       - 4 - integer    - 32768 (smallest+), -32769(largest-), 2147483647 (largest), -2147483648 (smallest)
 testInt53       - 3 - integer    - 2147483649 (smallest+), 9007199254740990, 9007199254740991 (largest)
-testInt64Pos    - 1 - integer    - 2147483648 (smallest+) FAILS!
-testInt64Neg    - 1 - integer    - -2147483649 (biggest-) FAILS!
+testInt64Pos    - 1 - integer    - 2^63-1 (biggest+) FAILS!
+testInt64Neg    - 1 - integer    - -2^63 (biggest-) FAILS!
 testIntDouble   - 1 - double     - tests putInteger("a", Math.PI)
 -------------------- END --------------------
 
