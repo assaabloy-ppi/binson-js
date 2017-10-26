@@ -22,7 +22,6 @@ let TextDecoder = require('./../lib/encoding.js')['TextDecoder']
 
 
 // ======== Binson object ========
-
 function Binson() {
 	if (!(this instanceof Binson)) {
 		return new Binson()
@@ -1047,7 +1046,7 @@ function parse(buffer, offset) {
 				// TODO: Get a 64-bit integer
 				// JavaScript only supports 53 bit integers
 				// binson.js only supports 32 bit integers
-				result = pGet64BitInteger()
+				result = get64BitInteger()
 
 				// It's easy to represent positive 64-bit integers up
 				// to 9007199254740991 so this will have to do
@@ -1073,7 +1072,7 @@ function parse(buffer, offset) {
 		return result
 	}
 
-	function pGet64BitInteger() {
+	function get64BitInteger() {
 		let res = 0
 		let bytes = new Uint8Array(8)	// 64-bit is 8 bytes
 		for (let i = 0; i < 8; i++) {
