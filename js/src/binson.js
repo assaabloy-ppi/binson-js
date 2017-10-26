@@ -146,7 +146,7 @@ Binson.prototype._integerToBytes = function(bytes, offset, integer) {
 			}
 		}
 	} else {
-		throw new Error("this._integerSize returned bad bytesize: " + size)
+		throw new Error('this._integerSize returned bad bytesize: ' + size)
 	}
 	return offset
 }
@@ -164,8 +164,8 @@ Binson.prototype._booleanToBytes = function(bytes, offset, bool) {
 
 Binson.prototype._objectToBytes = function(bytes, offset, obj) {
 	if (bytes.byteLength < 2) {
-		throw new Error("too few bytes left to parse object (_objectToBytes), "
-			+ bytes.byteLength + ", offset:" + offset)
+		throw new Error('too few bytes left to parse object (_objectToBytes), '
+			+ bytes.byteLength + ', offset:' + offset)
 	}
 	bytes.setUint8(offset, 0x40)
 	offset += 1
@@ -183,7 +183,7 @@ Binson.prototype._objectToBytes = function(bytes, offset, obj) {
 }
 
 Binson.prototype._stringToBytes = function(bytes, offset, string) {
-	let encoder = new TextEncoder("UTF-8")
+	let encoder = new TextEncoder('UTF-8')
 	let utf8 = encoder.encode(string)
 	let len = utf8.length
 	offset = this._stringLenToBytes(bytes, offset, len)
@@ -196,7 +196,7 @@ Binson.prototype._stringToBytes = function(bytes, offset, string) {
 
 Binson.prototype._bytesToBytes = function(bytes, offset, value) {
 	if (!(value instanceof ArrayBuffer)) {
-		throw new Error("expected ArrayBuffer: " + value)
+		throw new Error('expected ArrayBuffer: ' + value)
 	}
 	let u8 = new Uint8Array(value)
 	offset = this._bytesLenToBytes(bytes, offset, value.byteLength)
@@ -295,7 +295,7 @@ Binson.prototype._arraySize = function(array) {
 
 // ABNF: string = stringLen utf
 Binson.prototype._stringSize = function(string) {
-	let encoder = new TextEncoder("UTF-8")
+	let encoder = new TextEncoder('UTF-8')
 	let utf8Size = encoder.encode(string).length
 	let size = 1 + this._integerSize(utf8Size) + utf8Size
 	return size
@@ -327,25 +327,25 @@ Binson.prototype._integerSize = function(int) {
 Binson.prototype._valueSize = function(value) {
 	let size = 0
 	switch (value.type) {
-		case "string":
+		case 'string':
 			size += this._stringSize(value.value)
 			break
-		case "bytes":
+		case 'bytes':
 			size += this._bytesSize(value.value)
 			break
-		case "object":
+		case 'object':
 			size += this._objectSize(value.value)
 			break
-		case "boolean":
+		case 'boolean':
 			size += 1
 			break
-		case "integer":
+		case 'integer':
 			size += 1 + this._integerSize(value.value) // int hex id + int8/16/32/64 size
 			break
-		case "double":
+		case 'double':
 			size += 1 + 8					// double hex id + size of 64-bit float
 			break
-		case "array":
+		case 'array':
 			size += this._arraySize(value.value)
 			break
 	}
@@ -359,8 +359,8 @@ Binson.prototype._ensureIntegerPrecision = function(integer) {
 		if (integer <= 9007199254740991 && integer > 0) {
 			return
 		} else {
-			throw new Error("specified integer does not fit in 32 bits.\n\t" +
-					"Integer: " + integer)
+			throw new Error('specified integer does not fit in 32 bits.\n\t' +
+					'Integer: ' + integer)
 		}
 	}
 }
@@ -391,12 +391,12 @@ Binson.prototype._binsonTypeOf = function(v) {
 					return 'object'
 				}
 				if (v == null) {
-					throw new Error("Binson does not allow null")
+					throw new Error('Binson does not allow null')
 				}
 			default:
-				throw new Error("A variable must be a boolean, number (integer or float), string, " +
-					"instance of an ArrayBuffer, array, Binson object.\n\t" +
-					"Type: " + type)
+				throw new Error('A variable must be a boolean, number (integer or float), string, ' +
+					'instance of an ArrayBuffer, array, Binson object.\n\t' +
+					'Type: ' + type)
 		}
 }
 
@@ -406,13 +406,13 @@ Binson.prototype._binsonTypeCheckArray = function(name, array) {
 		try {
 			this._binsonTypeOf(array[i])
 			if (Array.isArray(array[i])) {
-				this._binsonTypeCheckArray("!!Nested!!", array[i])
+				this._binsonTypeCheckArray('!!Nested!!', array[i])
 			}
 		} catch (err) {
-			throw new Error("Invalid array element: \n\t" +
-				"Position: " + i + "\n\t" +
-				"Name: \"" + name + "\"\n\t" +
-				"Element: " + array[i] + "\n\n\t" +
+			throw new Error('Invalid array element: \n\t' +
+				'Position: ' + i + '\n\t' +
+				'Name: "' + name + '"\n\t' +
+				'Element: ' + array[i] + '\n\n\t' +
 				err)
 		}
 	}
@@ -441,10 +441,10 @@ Binson.prototype.has = function has(name) {
 
 	// STRING
 Binson.prototype.putString = function putString(name, value) {
-	if (!(typeof(value) === "string")) {
-		throw new Error("putString expected string")
+	if (!(typeof(value) === 'string')) {
+		throw new Error('putString expected string')
 	}
-	this._put("string", name, value)
+	this._put('string', name, value)
 	return this
 }
 
@@ -452,7 +452,7 @@ Binson.prototype.getString = function getString(name) {
 	let f = this._fields[name]
 	if (f === undefined) {
 		return undefined
-	} else if (f.type !== "string") {
+	} else if (f.type !== 'string') {
 		return undefined
 	}
 	return f.value
@@ -462,7 +462,7 @@ Binson.prototype.hasString = function hasString(name) {
 	let f = this._fields[name]
 	if (f === undefined) {
 		return false
-	} else if (f.type !== "string") {
+	} else if (f.type !== 'string') {
 		return false
 	}
 	return true
@@ -475,9 +475,9 @@ Binson.prototype.hasString = function hasString(name) {
 // ArrayBuffer value.
 Binson.prototype.putBytes = function putBytes(name, value) {
 	if (!(value instanceof ArrayBuffer)) {
-		throw new Error("putBytes expected ArrayBuffer")
+		throw new Error('putBytes expected ArrayBuffer')
 	}
-	this._put("bytes", name, value)
+	this._put('bytes', name, value)
 	return this
 }
 
@@ -485,7 +485,7 @@ Binson.prototype.getBytes = function getBytes(name) {
 	let f = this._fields[name]
 	if (f === undefined) {
 		return undefined
-	} else if (f.type !== "bytes") {
+	} else if (f.type !== 'bytes') {
 		return undefined
 	}
 	return f.value
@@ -495,7 +495,7 @@ Binson.prototype.hasBytes = function hasBytes(name) {
 	let f = this._fields[name]
 	if (f === undefined) {
 		return false
-	} else if (f.type !== "bytes") {
+	} else if (f.type !== 'bytes') {
 		return false
 	}
 	return true
@@ -507,9 +507,9 @@ Binson.prototype.hasBytes = function hasBytes(name) {
 // BINSON OBJECT
 Binson.prototype.putObject = function putObject(name, value) {
 	if (!(value instanceof Binson)) {
-		throw new Error("putObject expected a Binson object")
+		throw new Error('putObject expected a Binson object')
 	}
-	this._put("object", name, value)
+	this._put('object', name, value)
 	return this
 }
 
@@ -517,7 +517,7 @@ Binson.prototype.getObject = function getObject(name) {
 	let f = this._fields[name]
 	if (f === undefined) {
 		return undefined
-	} else if (f.type !== "object") {
+	} else if (f.type !== 'object') {
 		return undefined
 	}
 	return f.value
@@ -527,7 +527,7 @@ Binson.prototype.hasObject = function hasObject(name) {
 	let f = this._fields[name]
 	if (f === undefined) {
 		return false
-	} else if (f.type !== "object") {
+	} else if (f.type !== 'object') {
 	return false
 	}
 	return true
@@ -538,10 +538,10 @@ Binson.prototype.hasObject = function hasObject(name) {
 
 	// BOOLEAN
 Binson.prototype.putBoolean = function putBoolean(name, value) {
-	if (!(typeof(value) === "boolean")) {
-		throw new Error("putBoolean expected a boolean")
+	if (!(typeof(value) === 'boolean')) {
+		throw new Error('putBoolean expected a boolean')
 	}
-	this._put("boolean", name, value)
+	this._put('boolean', name, value)
 	return this
 }
 
@@ -549,7 +549,7 @@ Binson.prototype.getBoolean = function getBoolean(name) {
 	let f = this._fields[name]
 	if (f === undefined) {
 		return undefined
-	} else if (f.type !== "boolean") {
+	} else if (f.type !== 'boolean') {
 		return undefined
 	}
 	return f.value
@@ -559,7 +559,7 @@ Binson.prototype.hasBoolean = function hasBoolean(name) {
 	let f = this._fields[name]
 	if (f === undefined) {
 		return false
-	} else if (f.type !== "boolean") {
+	} else if (f.type !== 'boolean') {
 		return false
 	}
 	return true
@@ -573,10 +573,10 @@ Binson.prototype.hasBoolean = function hasBoolean(name) {
 // binson.js can only handle 32-bit integers
 Binson.prototype.putInteger = function putInteger(name, value) {
 	if (! Number.isInteger(value)) {
-		throw new Error("putInteger expected an integer")
+		throw new Error('putInteger expected an integer')
 	}
 	this._ensureIntegerPrecision(value)
-	this._put("integer", name, value)
+	this._put('integer', name, value)
 	return this
 }
 
@@ -584,7 +584,7 @@ Binson.prototype.getInteger = function getInteger(name) {
 let f = this._fields[name]
 	if (f === undefined) {
 		return undefined
-	} else if (f.type !== "integer") {
+	} else if (f.type !== 'integer') {
 		return undefined
 	}
 	return f.value
@@ -594,7 +594,7 @@ Binson.prototype.hasInteger = function hasInteger(name) {
 	let f = this._fields[name]
 	if (f === undefined) {
 		return false
-	} else if (f.type !== "integer") {
+	} else if (f.type !== 'integer') {
 		return false
 	}
 	return true
@@ -605,10 +605,10 @@ Binson.prototype.hasInteger = function hasInteger(name) {
 
 // DOUBLE
 Binson.prototype.putDouble = function putDouble(name, value) {
-	if (!(typeof(value) === "number")) {
-		throw new Error("putDouble expected a number")
+	if (!(typeof(value) === 'number')) {
+		throw new Error('putDouble expected a number')
 	}
-	this._put("double", name, value)
+	this._put('double', name, value)
 	return this
 }
 
@@ -616,7 +616,7 @@ Binson.prototype.getDouble = function getDouble(name) {
 	let f = this._fields[name]
 	if (f === undefined) {
 		return undefined
-	} else if (f.type !== "double") {
+	} else if (f.type !== 'double') {
 		return undefined
 	}
 	return f.value
@@ -626,7 +626,7 @@ Binson.prototype.hasDouble = function hasDouble(name) {
 	let f = this._fields[name]
 	if (f === undefined) {
 		return false
-	} else if (f.type !== "double") {
+	} else if (f.type !== 'double') {
 		return false
 	}
 	return true
@@ -638,10 +638,10 @@ Binson.prototype.hasDouble = function hasDouble(name) {
 // ARRAY
 Binson.prototype.putArray = function putArray(name, value) {
 	if (!(Array.isArray(value))) {
-		throw new Error("putArray expected an array")
+		throw new Error('putArray expected an array')
 	}
 	this._binsonTypeCheckArray(name, value)
-	this._put("array", name, value)
+	this._put('array', name, value)
 	return this
 }
 
@@ -649,7 +649,7 @@ Binson.prototype.getArray = function getArray(name) {
 	let f = this._fields[name]
 	if (f === undefined) {
 		return undefined
-	} else if (f.type !== "array") {
+	} else if (f.type !== 'array') {
 		return undefined
 	}
 	return f.value
@@ -659,7 +659,7 @@ Binson.prototype.hasArray = function hasArray(name) {
 	let f = this._fields[name]
 	if (f === undefined) {
 		return false
-	} else if (f.type !== "array") {
+	} else if (f.type !== 'array') {
 		return false
 	}
 	return true
@@ -673,7 +673,7 @@ Binson.prototype.toBytes = function toBytes() {
 	let size = this.byteSize()
 
 	if (isNaN(size) || size < 2) {
-		throw new Error("bad size: " + size)
+		throw new Error('bad size: ' + size)
 	}
 
 	let bytes = new DataView(new ArrayBuffer(size))
@@ -681,9 +681,9 @@ Binson.prototype.toBytes = function toBytes() {
 	let fieldNames = Object.keys(this._fields)
 
 	if (bytes.byteLength != size) {
-		throw new Error("bytes has unexpected length.\n\t" +
-				"Bytes.byteLength: " + bytes.byteLength + "\n\t" +
-				"this.byteSize(): " + size)
+		throw new Error('bytes has unexpected length.\n\t' +
+				'Bytes.byteLength: ' + bytes.byteLength + '\n\t' +
+				'this.byteSize(): ' + size)
 	}
 
 	offset = this._objectToBytes(bytes, offset, this)
@@ -708,11 +708,11 @@ Binson.prototype.byteSize = function byteSize() {
 	size += 1
 
 	if (isNaN(size)) {
-		throw new Error("size is NaN")
+		throw new Error('size is NaN')
 	}
 
 	if (size < 2) {
-		throw new Error("bad computed size, " + size)
+		throw new Error('bad computed size, ' + size)
 	}
 
 	return size
@@ -723,18 +723,18 @@ Binson.prototype.byteSize = function byteSize() {
 Binson.prototype.hex = function hex(){
 	let buffer = this.toBytes()
 	let uints = new Uint8Array(buffer)
-	let res = "["
+	let res = '['
 	for (let i = 0; i < uints.length-1; i++) {
 		if (uints[i] < 16) { // 16 = 0x10
-			res += "0x0" + uints[i].toString(16).toLowerCase()
+			res += '0x0' + uints[i].toString(16).toLowerCase()
 		} else {
-			res += "0x" + uints[i].toString(16).toLowerCase()
+			res += '0x' + uints[i].toString(16).toLowerCase()
 		}
-		res += ", "
+		res += ', '
 	}
 	// Always 0x41, we don't need the if-statement or toLowerCase
-	res += "0x" + uints[uints.length-1].toString(16)
-	res += "]"
+	res += '0x' + uints[uints.length-1].toString(16)
+	res += ']'
 	return res
 }
 
@@ -742,11 +742,11 @@ Binson.prototype.toBinsonString = function toBinsonString(indent = 0) {
 	indent = indent < 0 ? 0 : indent
 
 	let fieldNames = Object.keys(this._fields).sort()
-	let indentation = ""
+	let indentation = ''
 	for(let i = 0; i < indent; i++) {
-		indentation += "  "
+		indentation += '  '
 	}
-	let str = "{ \n"
+	let str = '{ \n'
 	let first = true
 	for (let i = 0; i < fieldNames.length; i++) {
 		let fieldName = fieldNames[i]
@@ -755,68 +755,135 @@ Binson.prototype.toBinsonString = function toBinsonString(indent = 0) {
 		if (first) {
 			first = false
 		} else {
-			str += ", \n"
+			str += ', \n'
 		}
-		str += indentation + "  "
+		str += indentation + '  '
 		str += fieldName
-		str += " := "
+		str += ' := '
 
-		str += valueToString(val.value, indent + 1)
+		str += valueToBinsonString(val.value, indent + 1)
 	}
-	str += "\n"
-	str += indentation + "}"
+	str += '\n'
+	str += indentation + '}'
 	return str
 }
 
-function valueToString(value, indent) {
-	let str = ""
-	if (typeof value === "string") {
-		str += "\"" + value + "\""
+function valueToBinsonString(value, indent) {
+	let str = ''
+	if (typeof value === 'string') {
+		str += '"' + value + '"'
 	} else if (value instanceof ArrayBuffer) {
 		str += ab2str(value)
 	} else if (value instanceof Binson) {
 		str += value.toBinsonString(indent)
-	} else if (typeof value === "boolean") {
-		str += value ? "true" : "false"
+	} else if (typeof value === 'boolean') {
+		str += value ? 'true' : 'false'
 	} else if (Number.isInteger(value)) {
 		str += value
-	} else if (typeof value === "number") {
+	} else if (typeof value === 'number') {
 		str += value
 	} else if (Array.isArray(value)) {
-		str += array2binsonString(value, indent)
+		str += arrayToBinsonString(value, indent)
 	}
+	return str
+}
+
+function arrayToBinsonString(arr, indent) {
+	let indentation = ''
+	for(let i = 0; i < indent; i++) {
+		indentation += '  '
+	}
+
+	let str = '[\n'
+	for (let i = 0; i < arr.length-1; i++) {
+		str += indentation + '  '
+		str += valueToBinsonString(arr[i], indent + 1)
+		str += ', \n'
+	}
+	str += indentation + '  '
+	str += valueToBinsonString(arr[arr.length-1], indent + 1)
+	str += '\n'
+	str += indentation + ']'
+	return str
+}
+
+Binson.prototype.toJson = function toJson(indent = 0) {
+	indent = indent < 0 ? 0 : indent
+
+	let fieldNames = Object.keys(this._fields).sort()
+	let indentation = ''
+	for(let i = 0; i < indent; i++) {
+		indentation += '  '
+	}
+	let str = '{ \n'
+	let first = true
+	for (let i = 0; i < fieldNames.length; i++) {
+		let fieldName = fieldNames[i]
+		let val = this._fields[fieldName]
+
+		if (first) {
+			first = false
+		} else {
+			str += ', \n'
+		}
+		str += indentation + '  '
+		str += '"' + fieldName + '"'
+		str += ' : '
+
+		str += valueToJson(val.value, indent + 1)
+	}
+	str += '\n'
+	str += indentation + '}'
+	return str
+}
+
+function valueToJson(value, indent) {
+	let str = ''
+	if (typeof value === 'string') {
+		str += '"' + value + '"'
+	} else if (value instanceof ArrayBuffer) {
+		str += '"' + ab2str(value) + '"'
+	} else if (value instanceof Binson) {
+		str += value.toJson(indent)
+	} else if (typeof value === 'boolean') {
+		str += value ? 'true' : 'false'
+	} else if (typeof value === 'number') {
+		str += value
+	} else if (Array.isArray(value)) {
+		str += arrayToJson(value, indent)
+	}
+	return str
+}
+
+function arrayToJson(arr, indent) {
+	let indentation = ''
+	for(let i = 0; i < indent; i++) {
+		indentation += '  '
+	}
+
+	let str = '[\n'
+	for (let i = 0; i < arr.length-1; i++) {
+		str += indentation + '  '
+		str += valueToJson(arr[i], indent + 1)
+		str += ', \n'
+	}
+	str += indentation + '  '
+	str += valueToJson(arr[arr.length-1], indent + 1)
+	str += '\n'
+	str += indentation + ']'
 	return str
 }
 
 function ab2str(ab) {
 	let uints = new Uint8Array(ab)
-	let str = "0x"
+	let str = '0x'
 	for(let i = 0; i < uints.length; i++) {
 		if (uints[i] < 16) { // 16 = 0x10
-			str += "0" + uints[i].toString(16).toLowerCase()
+			str += '0' + uints[i].toString(16).toLowerCase()
 		} else {
 			str += uints[i].toString(16).toLowerCase()
 		}
 	}
-	return str
-}
-
-function array2binsonString(arr, indent) {
-	let indentation = ""
-	for(let i = 0; i < indent; i++) {
-		indentation += "  "
-	}
-
-	let str = "[\n"
-	for (let i = 0; i < arr.length-1; i++) {
-		str += indentation + "  "
-		str += valueToString(arr[i], indent + 1)
-		str += ", \n"
-	}
-	str += indentation + "  "
-	str += valueToString(arr[arr.length-1], indent + 1)
-	str += "\n"
-	str += indentation + "]"
 	return str
 }
 
@@ -848,10 +915,10 @@ function parse(buffer, offset) {
 		let b = view.getUint8(offset)
 		offset += 1
 		if (b != 0x40) {
-			throw new Error("bad first byte in object, 0x" + b.toString(16) + " expected 0x40")
+			throw new Error('bad first byte in object, 0x' + b.toString(16) + ' expected 0x40')
 		}
 		let name, value
-		let prevName = ""
+		let prevName = ''
 		while (true) {
 			b = view.getUint8(offset)
 			if (b == 0x41) {
@@ -863,20 +930,20 @@ function parse(buffer, offset) {
 			value = parseValue(buffer, offset, view)
 
 			if (name < prevName) {
-				throw new Error("Bad format. \n\t" +
-					"Fields not in lexicographical order when parsing. \n\t\t" +
-						"Previous field: " + prevName + "\n\t\t" +
-						"Current field: " + name)
+				throw new Error('Bad format. \n\t' +
+					'Fields not in lexicographical order when parsing. \n\t\t' +
+						'Previous field: ' + prevName + '\n\t\t' +
+						'Current field: ' + name)
 			}
-			if (!(typeof(result._fields[name]) == "undefined" )) {
-				let str = pParsedtoByteString()
-				throw new Error("Bad format. \n\t" +
-					"Found two fields with the same name when parsing. \n\t\t" +
-						"Duplicate field name at: " + fieldOffset + "\n\t\t" +
-						"Field name: \"" + name + "\"\n\t\t" +
-						"1st value: " + result._fields[name].value + "\n\t\t" +
-						"2nd value: " + value.value + "\n\t\t" +
-						"Bytes: " + str)
+			if (!(typeof(result._fields[name]) == 'undefined' )) {
+				let str = parsedtoByteString()
+				throw new Error('Bad format. \n\t' +
+					'Found two fields with the same name when parsing. \n\t\t' +
+						'Duplicate field name at: ' + fieldOffset + '\n\t\t' +
+						'Field name: "' + name + '"\n\t\t' +
+						'1st value: ' + result._fields[name].value + '\n\t\t' +
+						'2nd value: ' + value.value + '\n\t\t' +
+						'Bytes: ' + str)
 			}
 			prevName = name
 
@@ -905,11 +972,11 @@ function parse(buffer, offset) {
 			offset += 4
 			break
 		default:
-			throw new Error("bad byte, expected stringLen, got byte " + b)
+			throw new Error('bad byte, expected stringLen, got byte ' + b)
 			break
 		}
 
-		let decoder = new TextDecoder("UTF-8")
+		let decoder = new TextDecoder('UTF-8')
 		let stringBytes = new DataView(buffer, offset, len)
 		let string = decoder.decode(stringBytes)
 		offset += len
@@ -937,12 +1004,12 @@ function parse(buffer, offset) {
 			offset += 4
 			break
 		default:
-			throw new Error("unexpected byte, " + b)
+			throw new Error('unexpected byte, ' + b)
 			break
 		}
 
 		if (len < 0) {
-			throw new Error("len negative, not allowed, bad format, " + b + ", " + len)
+			throw new Error('len negative, not allowed, bad format, ' + b + ', ' + len)
 		}
 		let buffer= new ArrayBuffer(len)
 		let bytes = new Uint8Array(buffer)
@@ -988,18 +1055,18 @@ function parse(buffer, offset) {
 				if ( 0 < result && result <= 9007199254740991 ) {
 					offset += 8
 				} else {
-					let bytes = ""
+					let bytes = ''
 					for (let i = 0; i < 8; i++) {
-						bytes += view.getUint8(offset).toString(16) + " "
+						bytes += view.getUint8(offset).toString(16) + ' '
 						offset += 1
 					}
-					throw new Error("JavaScript cannot handle 64-bit integers.\n\t" +
-						"Little-endian bytes: " + bytes)
+					throw new Error('JavaScript cannot handle 64-bit integers.\n\t' +
+						'Little-endian bytes: ' + bytes)
 				}
 				break
 
 			default:
-				throw new Error("unexpected start byte when parsing integer: " + b)
+				throw new Error('unexpected start byte when parsing integer: ' + b)
 				break
 		}
 
@@ -1069,7 +1136,7 @@ function parse(buffer, offset) {
 		case 0x12:
 		case 0x13:
 			// int8/16/32/64
-			result.type = "integer"
+			result.type = 'integer'
 			result.value = parseInteger()
 			break
 
@@ -1077,7 +1144,7 @@ function parse(buffer, offset) {
 		case 0x15:
 		case 0x16:
 			// stringLen
-			result.type = "string"
+			result.type = 'string'
 			result.value = parseString()
 			break
 
@@ -1085,46 +1152,46 @@ function parse(buffer, offset) {
 		case 0x19:
 		case 0x1a:
 			// bytesLen
-			result.type = "bytes"
+			result.type = 'bytes'
 			result.value = parseBytes()
 			break
 
 		case 0x40:
 			// object
-			result.type = "object"
+			result.type = 'object'
 			result.value = parseObject()
 			break
 
 		case 0x42:
 			// array
-			result.type = "array"
+			result.type = 'array'
 			result.value = parseArray()
 			break
 
 		case 0x44:
 			// true
-			result.type = "boolean"
+			result.type = 'boolean'
 			result.value = true
 			offset += 1
 			break
 
 		case 0x45:
 			// false
-			result.type = "boolean"
+			result.type = 'boolean'
 			result.value = false
 			offset += 1
 			break
 
 		case 0x46:
 			// double
-			result.type = "double"
+			result.type = 'double'
 			result.value = parseDouble()
 			break
 
 		default:
-			throw new Error("error, or unsupported type. \n\t"+
-			"Byte: 0x" + b.toString(16) + "\n\t" +
-			"Offset: " + offset)
+			throw new Error('error, or unsupported type. \n\t'+
+			'Byte: 0x' + b.toString(16) + '\n\t' +
+			'Offset: ' + offset)
 			break
 		}
 
@@ -1135,25 +1202,25 @@ function parse(buffer, offset) {
 	// Returns what has been parsed so far as a string of bytes
 	// as hexadecimal values
 	//
-	function pParsedtoByteString() {
+	function parsedtoByteString() {
 		// this.offset points at the next thing to be parsed
 		offset -= 1
 
-		let str = "["
+		let str = '['
 		let byte
 		for (let i = 0; i < offset-1; i++) {
 			byte = view.getUint8(i)
 			if (byte < 10) {
-				str += "0x0" + byte.toString(16) + ", "
+				str += '0x0' + byte.toString(16) + ', '
 			} else {
-				str += "0x" + byte.toString(16) + ", "
+				str += '0x' + byte.toString(16) + ', '
 			}
 		}
 		byte = view.getUint8(offset)
 		if (byte < 10) {
-			str += "0x0" + byte.toString(16) + ", ... (not parsed)]"
+			str += '0x0' + byte.toString(16) + ', ... (not parsed)]'
 		} else {
-			str += "0x" + byte.toString(16) + ", ... (not parsed)]"
+			str += '0x' + byte.toString(16) + ', ... (not parsed)]'
 		}
 
 		// So that this.offset is unchanged by the function
