@@ -18,6 +18,7 @@ Table of Contents
   * [Checking for field existance](#checking-for-field-existance)
   * [Getting a hex string](#getting-a-hex-string)
   * [Getting a human readable string](#getting-a-human-readable-string)
+  * [Binson equality](#binson-equality)
 * [For binson-js developers](#for-binson-js-developers)
   * [Requirements](#requirements)
   * [GIT repo](#git-repo)
@@ -25,6 +26,8 @@ Table of Contents
 
 Status
 ======
+
+2017-10-27. Add methods toJoson() and equals()
 
 2017-10-19. Update to use module.exports. Use public domain lib to do UTF-8 encoding and decoding.
 
@@ -42,6 +45,7 @@ numbers that does not fit in 32 bits.
 Usage
 =====
 
+
 Adding binson-js to your project
 --------------------------------
 
@@ -54,6 +58,7 @@ See js/src-test/ for more detailed examples of how to use binson.js
 The Binson specification states that field names has to be unique. Therefore
 if you try to add a second field with the same name the first field will be
 overwritten.
+
 
 Creating Binson objects
 -----------------------
@@ -69,6 +74,7 @@ will always be called with the **new** keyword regardless of usage.
     console.log(bin1 instanceof Binson) // true
     console.log(bin2 instanceof Binson) // true
 
+
 Serializing Binson objects
 --------------------------
 
@@ -76,8 +82,10 @@ Serializing Binson objects
 
 Returns an ArrayBuffer with a serialized Binson object.
 
-    var bin = new Binson().putString("aField", "aValue")
+    var bin = getInterestingBinson()
+
     var buff = bin.toBytes()
+
 
 Deserializing Binson objects
 ----------------------------
@@ -115,28 +123,28 @@ exists in the Binson object the field value is replaced.
 
 #### putString(name, value);
 
-    var bin = new Binson().putString("a", "a");
-    var smallA = bin.get("a");  // "a"
-    bin.putString("a", "A");
-    var bigA = bin.get("a");    // "A"
+    var bin = new Binson().putString('a', 'a');
+    var smallA = bin.get('a');  // "a"
+    bin.putString('a', 'A');
+    var bigA = bin.get('a');    // "A"
 
 #### putBytes(name, value);
 
     var bin = new Binson();
     var buff = getMyArrayBuffer();
-    bin.putBytes("buffer", buff);
+    bin.putBytes('buffer', buff);
 
 #### putObject(name, value);
 
     var bin = new Binson();
     var innerBin = new Binson();
-    bin.putObject("bin", innerBin);
+    bin.putObject('bin', innerBin);
 
 #### putBoolean(name, value);
 
     var bin = new Binson();
     var bool = true;
-    bin.putBoolean("trueOrFalse", bool);
+    bin.putBoolean('trueOrFalse', bool);
 
 #### putInteger(name, value);
 
@@ -147,21 +155,22 @@ throws an error if the integer is not within the valid range.
 
     var bin = new Binson();
     var value = 235;
-    bin.putInteger("number", value);
+    bin.putInteger('number', value);
 
 #### putDouble(name, value);
 
     var bin = new Binson();
     var value = 3.14;
-    bin.putDouble("pi", vaue);
+    bin.putDouble('pi', vaue);
 
 #### putArray(name, value);
 
 When adding an array every element of the array is typecheked recursively
 
     var bin = new Binson();
-    var value = [new Binson, 12, "Hello", true];
-    bin.putArray("array", value);
+    var value = [new Binson, 12, 'Hello', true];
+    bin.putArray('array', value);
+
 
 Getting field values
 --------------------
@@ -177,50 +186,51 @@ returns undefined if there is no field of the requested type.
 It is possible to get the value of a field without any typechecking
 
     var bin = getAuthorBin()
-    var name = bin.get("name")
-    var string = "The authors name is " + name
+    var name = bin.get('name')
+    var string = 'The authors name is ' + name
 
 #### object.getString(name)
 
     var bin = getAuthorBin()
-    var name = bin.getString("name")
-    var string = "The authors name is " + name
+    var name = bin.getString('name')
+    var string = 'The authors name is ' + name
 
 #### object.getBytes(name)
 
     var bin = getAuthorBin()
-    var pubkey = bin.getBytes("pubkey")
-    var string = "The authors public key is " + bytes2string(pubkey)
+    var pubkey = bin.getBytes('pubkey')
+    var string = 'The authors public key is ' + bytes2string(pubkey)
 
 #### object.getObject(name)
 
     var bin = getAuthorBin()
-    var adress = bin.getObject("adress")
-    var string = "The author lives on " + adress.getString("street")
+    var adress = bin.getObject('adress')
+    var string = 'The author lives on ' + adress.getString('street')
 
 #### object.getBoolean(name)
 
     var bin = getAuthorBin()
-    var alive = bin.getBoolean("alive")
-    var string = "The author is " + (alive ? "alive" : "dead")
+    var alive = bin.getBoolean('alive')
+    var string = 'The author is ' + (alive ? 'alive' : 'dead')
 
 #### object.getInteger(name)
 
     var bin = getAuthorBin()
-    var birthyear = bin.getAge("birthyear")
-    var string = "The author was born in " + birthyear
+    var birthyear = bin.getAge('birthyear')
+    var string = 'The author was born in ' + birthyear
 
 #### object.getDouble(name)
 
     var bin = getAuthorBin()
-    var height = bin.getDouble("height")
-    var string = "The authors height is " + height
+    var height = bin.getDouble('height')
+    var string = 'The authors height is ' + height
 
 #### object.getArray(name)
 
     var bin = getAuthorBin()
-    var books = bin.getArray("books")
-    var string = "The authors first book was " + books[0]
+    var books = bin.getArray('books')
+    var string = 'The authors first book was ' + books[0]
+
 
 Checking for field existance
 ----------------------------
@@ -230,11 +240,11 @@ depending on if the corresponding get-method would return undefined or not.
 If get would return *undefined* has returns *false*, otherwise has returns *true*.
 
     var bin = getAuthorBin()
-    var name = bin.getString("name")
-    if (bin.hasString("penName")) {
-        name = bin.getString("penName")
+    var name = bin.getString('name')
+    if (bin.hasString('penName')) {
+        name = bin.getString('penName')
     }
-    var str = "The authors name is " + name
+    var str = 'The authors name is ' + name
 
 
 Getting a hex string
@@ -246,8 +256,10 @@ Returns the Binson object as a hex string on the form
 "[byte1, byte2, ..., byteN]", where byteI is on the
 form 0xQQ where Q is a hexadecimal digit.
 
-    var bin = new Binson().putString("a")
+    var bin = new Binson()
+        .putString('a')
     console.log(bin.hex())  // [0x40, 0x14, 0x01, 0x61, 0x14, 0x01, 0x61, 0x41]
+
 
 Getting a human readable string
 -------------------------------
@@ -256,7 +268,10 @@ Getting a human readable string
 
 Returns the Binson object as a human readable string.
 
-    var bin = new Binson().putInteger("a", 4711).putArray("b", [7, true])
+    var bin = new Binson()
+        .putInteger('a', 4711)
+        .putArray('b', [7, true])
+
     console.log(bin.toBinsonString())
     //  {
     //    a := 4711,
@@ -265,6 +280,45 @@ Returns the Binson object as a human readable string.
     //      true
     //    ]
     //  }
+
+#### object.toJson()
+
+Returns the Binson object as a JSON string
+
+    var bin = new Binson()
+        .putInteger('a', 4711)
+        .putArray('b', [7, true])
+        .putBytes('c', new ArrayBuffer(2))
+
+    console.log(bin.toJson())
+    //  {
+    //    "a" := 4711,
+    //    "b" := [
+    //      7,
+    //      true
+    //    ]
+    //  }
+
+
+Binson equality
+---------------
+
+#### object.equals(bin)
+
+Returns true if and only if *bin* is a Binson object and serializes to the exact same ArrayBuffer as *object*.
+
+    var bin1 = new Binson()
+        .putArray('a', [17, 4711])
+
+    var bin2 = new Binson()
+        .putArray('a', [17, 4711])
+
+    var bin3 = new Binson()
+        .putArray('a', [4711, 17])
+
+    console.log(bin1.equals(bin1)) // true
+    console.log(bin1.equals(bin2)) // true
+    console.log(bin1.equals(bin3)) // false
 
 
 For binson-js developers
