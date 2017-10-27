@@ -874,16 +874,19 @@ function arrayToJson(arr, indent) {
 }
 
 function ab2str(ab) {
-	let uints = new Uint8Array(ab)
-	let str = '0x'
-	for(let i = 0; i < uints.length; i++) {
-		if (uints[i] < 16) { // 16 = 0x10
-			str += '0' + uints[i].toString(16).toLowerCase()
-		} else {
-			str += uints[i].toString(16).toLowerCase()
-		}
+	return Array.prototype.map.call(new Uint8Array(ab),
+    		x => ('00' + x.toString(16)).slice(-2)).join('');
+}
+
+
+Binson.prototype.equals = function equals(bin) {
+	if (!(bin instanceof Binson)) {
+		return false
 	}
-	return str
+	let me = ab2str(this.toBytes())
+	let other = ab2str(bin.toBytes())
+
+	return me === other
 }
 
 // buffer = ArrayBuffer, the bytes to parse.
