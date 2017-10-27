@@ -292,8 +292,8 @@ Returns the Binson object as a JSON string
 
     console.log(bin.toJson())
     //  {
-    //    "a" := 4711,
-    //    "b" := [
+    //    "a" : 4711,
+    //    "b" : [
     //      7,
     //      true
     //    ]
