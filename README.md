@@ -121,32 +121,32 @@ error. The put-methods take two parameters, a field name
 and a value. If a field with the specified name already
 exists in the Binson object the field value is replaced.
 
-#### putString(name, value);
+#### object.putString(name, value);
 
     var bin = new Binson().putString('a', 'a');
     var smallA = bin.get('a');  // "a"
     bin.putString('a', 'A');
     var bigA = bin.get('a');    // "A"
 
-#### putBytes(name, value);
+#### object.putBytes(name, value);
 
     var bin = new Binson();
     var buff = getMyArrayBuffer();
     bin.putBytes('buffer', buff);
 
-#### putObject(name, value);
+#### object.putObject(name, value);
 
     var bin = new Binson();
     var innerBin = new Binson();
     bin.putObject('bin', innerBin);
 
-#### putBoolean(name, value);
+#### object.putBoolean(name, value);
 
     var bin = new Binson();
     var bool = true;
     bin.putBoolean('trueOrFalse', bool);
 
-#### putInteger(name, value);
+#### object.putInteger(name, value);
 
 binson-js can currently handle integer values in the the
 range [-2^31, 2^53-1] instead of the full range [-2^63, 2^63-1]
@@ -157,13 +157,13 @@ throws an error if the integer is not within the valid range.
     var value = 235;
     bin.putInteger('number', value);
 
-#### putDouble(name, value);
+#### object.putDouble(name, value);
 
     var bin = new Binson();
     var value = 3.14;
     bin.putDouble('pi', vaue);
 
-#### putArray(name, value);
+#### object.putArray(name, value);
 
 When adding an array every element of the array is typecheked recursively
 
@@ -234,6 +234,8 @@ It is possible to get the value of a field without any typechecking
 
 Checking for field existance
 ----------------------------
+
+#### object.hasX(name)
 
 Every get-method has a corresponding has-method that returns true or false
 depending on if the corresponding get-method would return undefined or not.
