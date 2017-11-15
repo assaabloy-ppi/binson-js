@@ -27,6 +27,8 @@ Table of Contents
 Status
 ======
 
+2017-11-15. Improve error messages
+
 2017-10-27. Add methods toJoson() and equals()
 
 2017-10-19. Update to use module.exports. Use public domain lib to do UTF-8 encoding and decoding.
