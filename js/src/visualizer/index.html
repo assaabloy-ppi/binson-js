@@ -24,7 +24,8 @@
 		try {
 			let bin = Binson.fromBytes(ab)
 			str = 'input = '
-			str += bin.toJson()
+			//str += bin.toJson()
+			str += bin.toBinsonString()
 		} catch (err) {
 			str = 'Could not parse Binson from input:\n'
 			str += '  ' + err.message

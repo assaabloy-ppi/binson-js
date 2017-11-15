@@ -772,7 +772,7 @@ function valueToBinsonString(value, indent) {
 	if (typeof value === 'string') {
 		str += '"' + value + '"'
 	} else if (value instanceof ArrayBuffer) {
-		str += ab2str(value)
+		str += '0x' + ab2str(value)
 	} else if (value instanceof Binson) {
 		str += value.toBinsonString(indent)
 	} else if (typeof value === 'boolean') {
@@ -841,7 +841,7 @@ function valueToJson(value, indent) {
 	if (typeof value === 'string') {
 		str += '"' + value + '"'
 	} else if (value instanceof ArrayBuffer) {
-		str += '"' + ab2str(value) + '"'
+		str += '"0x' + ab2str(value) + '"'
 	} else if (value instanceof Binson) {
 		str += value.toJson(indent)
 	} else if (typeof value === 'boolean') {
