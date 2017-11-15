@@ -907,7 +907,9 @@ function parse(buffer, offset) {
 	if (!(buffer instanceof ArrayBuffer)) {
 		throw new TypeError('Can only parse ArrayBuffer')
 	}
-
+	if (buffer.byteLength < 2) {
+		throw new RangeError('Buffer must be at least 2 bytes long')
+	}
 	let view = new DataView(buffer)
 	return parseObject()
 
@@ -917,7 +919,11 @@ function parse(buffer, offset) {
 		let b = view.getUint8(offset)
 		offset += 1
 		if (b != 0x40) {
-			throw new Error('bad first byte in object, 0x' + b.toString(16) + ' expected 0x40')
+			let prefix = '0x'
+			if (b < 16) {
+				prefix += '0'
+			}
+			throw new Error('bad first byte in object, ' + prefix + b.toString(16) + ' expected 0x40')
 		}
 		let name, value
 		let prevName = ''
@@ -974,7 +980,11 @@ function parse(buffer, offset) {
 			offset += 4
 			break
 		default:
-			throw new Error('bad byte, expected stringLen, got byte ' + b)
+			let prefix = '0x'
+			if (b < 16) {
+				prefix += '0'
+			}
+			throw new Error('bad byte, expected stringLen, got byte ' + prefix + b.toString(16))
 			break
 		}
 
@@ -1006,12 +1016,16 @@ function parse(buffer, offset) {
 			offset += 4
 			break
 		default:
-			throw new Error('unexpected byte, ' + b)
+			let prefix = '0x'
+			if (b < 16) {
+				prefix += '0'
+			}
+			throw new Error('unexpected byte, ' + prefix + b.toString(16))
 			break
 		}
 
 		if (len < 0) {
-			throw new Error('len negative, not allowed, bad format, ' + b + ', ' + len)
+			throw new Error('len negative, not allowed, bad format, 0x' + b.toString(16) + ', ' + len)
 		}
 		let buffer= new ArrayBuffer(len)
 		let bytes = new Uint8Array(buffer)
@@ -1059,7 +1073,11 @@ function parse(buffer, offset) {
 				} else {
 					let bytes = ''
 					for (let i = 0; i < 8; i++) {
-						bytes += view.getUint8(offset).toString(16) + ' '
+						let byte = view.getUint8(offset)
+						if (byte < 16) {
+							bytes += '0'
+						}
+						bytes += byte.toString(16) + ' '
 						offset += 1
 					}
 					throw new Error('JavaScript cannot handle 64-bit integers.\n\t' +
@@ -1068,7 +1086,11 @@ function parse(buffer, offset) {
 				break
 
 			default:
-				throw new Error('unexpected start byte when parsing integer: ' + b)
+				let prefix = '0x'
+				if (b < 16) {
+					prefix += '0'
+				}
+				throw new Error('unexpected start byte when parsing integer: ' + prefix + b.toString(16))
 				break
 		}
 
@@ -1191,8 +1213,12 @@ function parse(buffer, offset) {
 			break
 
 		default:
+			let prefix = '0x'
+			if (b < 16) {
+				prefix += '0'
+			}
 			throw new Error('error, or unsupported type. \n\t'+
-			'Byte: 0x' + b.toString(16) + '\n\t' +
+			'Byte: ' + prefix + b.toString(16) + '\n\t' +
 			'Offset: ' + offset)
 			break
 		}
@@ -1212,14 +1238,14 @@ function parse(buffer, offset) {
 		let byte
 		for (let i = 0; i < offset-1; i++) {
 			byte = view.getUint8(i)
-			if (byte < 10) {
+			if (byte < 16) {
 				str += '0x0' + byte.toString(16) + ', '
 			} else {
 				str += '0x' + byte.toString(16) + ', '
 			}
 		}
 		byte = view.getUint8(offset)
-		if (byte < 10) {
+		if (byte < 16) {
 			str += '0x0' + byte.toString(16) + ', ... (not parsed)]'
 		} else {
 			str += '0x' + byte.toString(16) + ', ... (not parsed)]'
