@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8" />
+<script src="bundle.js"></script>
+
+</meta>
+
+<style>
+	textarea {
+		white-space: pre;
+  		overflow-wrap: normal;
+	}
+</style>
+</head>
+
+<script type="text/javascript">
+	let Binson = require('binson')
+
+	function visualize() {
+		let hexString = document.getElementById('binBytes').value
+
+		let ab = hex2ab(hexString)
+		let str
+		try {
+			let bin = Binson.fromBytes(ab)
+			str = 'input = '
+			str += bin.toJson()
+		} catch (err) {
+			str = 'Could not parse Binson from input:\n'
+			str += '  ' + err.message
+			console.error(err)
+		}
+
+		document.getElementById('binAsJson').innerHTML = str
+
+	}
+
+	function hex2ab (hex) {
+	if (typeof hex !== 'string') {
+		throw new TypeError('Input must be string, was ' + typeof hex)
+	}
+	hex = hex.trim()
+	if (hex.length % 2 !== 0) {
+		throw new RangeError('String length must be even')
+	}
+	if (hex.substring(0,2) === '0x') {
+		hex = hex.substring(2, hex.length)
+	}
+
+	let arr = []
+	for (let i = 0; i < hex.length; i += 2) {
+		arr.push(parseInt(hex.substring(i, i+2), 16))
+	}
+	return new Uint8Array(arr).buffer
+}
+</script>
+<body>
+
+<input autofocus type="text" id="binBytes">
+<button onclick="visualize()">Visualize</button>
+<p>Visualization:</p>
+
+<textarea readonly rows='40' cols="100" id='binAsJson'></textarea>
+
+</body>
+
+</html>
