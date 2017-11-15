@@ -18,14 +18,20 @@
 
 	function visualize() {
 		let hexString = document.getElementById('binBytes').value
+		let checked = document.getElementById('toJsonBox').checked
+		console.log(checked)
 
 		let ab = hex2ab(hexString)
 		let str
 		try {
 			let bin = Binson.fromBytes(ab)
 			str = 'input = '
-			//str += bin.toJson()
-			str += bin.toBinsonString()
+			if (checked) {
+				str += bin.toJson()
+			} else {
+				str += bin.toBinsonString()
+			}
+
 		} catch (err) {
 			str = 'Could not parse Binson from input:\n'
 			str += '  ' + err.message
@@ -59,6 +65,7 @@
 
 <input autofocus type="text" id="binBytes">
 <button onclick="visualize()">Visualize</button>
+<input type="checkbox" id="toJsonBox" value="json"> As JSON
 <p>Visualization:</p>
 
 <textarea readonly rows='40' cols="100" id='binAsJson'></textarea>
