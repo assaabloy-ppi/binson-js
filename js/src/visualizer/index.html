@@ -1,75 +1,243 @@
 <!DOCTYPE html>
-<head>
-<meta charset="utf-8" />
-<script src="bundle.js"></script>
+<html lang="en">
+    <head>
+        <title>Binson Visualizer</title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-</meta>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
+        <meta charset="utf-8" />
+        <script src="bundle.js"></script>
 
-<style>
-	textarea {
-		white-space: pre;
-  		overflow-wrap: normal;
-	}
-</style>
-</head>
+        <script type="text/javascript">
 
-<script type="text/javascript">
-	let Binson = require('binson')
+            Array.prototype.remove = function() {
+                var what, a = arguments, L = a.length, ax;
+                while (L && this.length) {
+                    what = a[--L];
+                    while ((ax = this.indexOf(what)) !== -1) {
+                        this.splice(ax, 1);
+                    }
+                }
+                return this;
+            };
 
-	function visualize() {
-		let hexString = document.getElementById('binBytes').value
-		let checked = document.getElementById('toJsonBox').checked
-		console.log(checked)
+            let Binson = require('binson')
 
-		let ab = hex2ab(hexString)
-		let str
-		try {
-			let bin = Binson.fromBytes(ab)
-			str = 'input = '
-			if (checked) {
-				str += bin.toJson()
-			} else {
-				str += bin.toBinsonString()
-			}
+            function purify(string) {
+                var strings = [];
+                string.trim().split(/[\s,]+/).forEach(function(chars) {
+                    chars = chars.replace(/[^\x30-\x7F]/g, "");
 
-		} catch (err) {
-			str = 'Could not parse Binson from input:\n'
-			str += '  ' + err.message
-			console.error(err)
-		}
+                    if (chars.startsWith("0x") || chars.startsWith("0X")) {
+                        chars = chars.substring(2);
+                    }
 
-		document.getElementById('binAsJson').innerHTML = str
+                    if (chars.length < 2 || chars.length % 2 != 0) {
+                        return;
+                    }
 
-	}
+                    strings.push(chars);
 
-	function hex2ab (hex) {
-	if (typeof hex !== 'string') {
-		throw new TypeError('Input must be string, was ' + typeof hex)
-	}
-	hex = hex.trim()
-	if (hex.length % 2 !== 0) {
-		throw new RangeError('String length must be even')
-	}
-	if (hex.substring(0,2) === '0x') {
-		hex = hex.substring(2, hex.length)
-	}
+                });
 
-	let arr = []
-	for (let i = 0; i < hex.length; i += 2) {
-		arr.push(parseInt(hex.substring(i, i+2), 16))
-	}
-	return new Uint8Array(arr).buffer
-}
-</script>
-<body>
+                return strings;
+            }
 
-<input autofocus type="text" id="binBytes">
-<button onclick="visualize()">Visualize</button>
-<input type="checkbox" id="toJsonBox" value="json"> As JSON
-<p>Visualization:</p>
+            var visualizer;
 
-<textarea readonly rows='40' cols="100" id='binAsJson'></textarea>
+            function setVisualizer(v) {
+                visualizer = v;
+                visualize();
+            }
 
-</body>
+            function start() {
+                document.getElementById('binBytes').innerHTML = "0x4014016314056c6f67696e140169100a14016f14017314017a4014014114027631140263684219bb005fc0d0e476aaf6e62a8b89ad53f728aa29aa810cbf356cc19e37aa027c3354949339858b36b76d1b06293e4f9a3b1953a7ee5867af2c045b02ff58df456aed05401401611801001402667218205529ce8ccf68c0b8ac19d437ab0f5b32723782608e93c6264f184ba152c2357b1401704218010b14026c754314027463180c500100000000ffffff7f00001402746e1403426f621402746f182007e28d4ee32bfdc4b07d41c92193c0c25ee6b3094c6296f373413b373d36168b41434141";
+                setVisualizer(visualizeBinson);
+            }
+
+            function visualize() {
+                visualizer();
+            }
+
+
+            function visualizeSwiftArray() {
+                let hexString = document.getElementById('binBytes').value
+                var strings = purify(hexString);
+                document.getElementById('binAsJson').innerHTML = "";
+
+                strings.forEach(function(bytes) {
+
+                    let str = '[UInt8] = [\n    ';
+
+                    var k = 1;
+
+                    for (var i = 0; i < bytes.length; i+=2) {
+                        str += '0x' + bytes[i] + bytes[i+1];
+                        
+                        if (i + 2 == bytes.length) {
+                            str += '\n';
+                        } else if (k % 8 == 0) {
+                            str += ',\n    ';
+                        } else {
+                            str += ', ';
+                        }
+                        k++;
+                    }
+
+                    str += ']\n\n';
+
+                    document.getElementById('binAsJson').innerHTML += str + '\n\n';
+                });
+            }
+
+            function charString() {
+                let hexString = document.getElementById('binBytes').value
+                var strings = purify(hexString);
+                document.getElementById('binAsJson').innerHTML = "";
+
+                strings.forEach(function(bytes) {
+
+                    let str = '[' + bytes.length/2 + '] = "';
+
+                    for (var i = 0; i < bytes.length; i+=2) {
+                        str += '\\x' + bytes[i] + bytes[i+1];
+                        
+                    }
+
+                    str += '"\n\n';
+
+                    document.getElementById('binAsJson').innerHTML += str + '\n\n';
+                });
+            }
+
+            function visualizeCArray() {
+                let hexString = document.getElementById('binBytes').value
+                var strings = purify(hexString);
+                document.getElementById('binAsJson').innerHTML = "";
+
+                strings.forEach(function(bytes) {
+
+                    let str = '[' + bytes.length/2 + '] = { /* ' + bytes + '*/\n    ';
+
+                    var k = 1;
+
+                    for (var i = 0; i < bytes.length; i+=2) {
+                        str += '0x' + bytes[i] + bytes[i+1];
+                        
+                        if (i + 2 == bytes.length) {
+                            str += '\n';
+                        } else if (k % 8 == 0) {
+                            str += ',\n    ';
+                        } else {
+                            str += ', ';
+                        }
+                        k++;
+                    }
+
+                    str += '};\n\n';
+
+                    document.getElementById('binAsJson').innerHTML += str + '\n\n';
+                });
+            }
+
+            function visualizeBinson() {
+                let hexString = document.getElementById('binBytes').value
+
+                var strings = purify(hexString);
+
+                document.getElementById('binAsJson').innerHTML = "";
+
+                strings.forEach(function(binBytes) {
+                    
+                    let str = 'Hexstring: ' + binBytes + '\n';
+                    try {
+                        let ab = hex2ab(binBytes)
+                        let bin = Binson.fromBytes(ab)
+                        str += 'input = '
+                        str += bin.toBinsonString()
+                    } catch (err) {
+                        str += 'Could not parse Binson from input:\n'
+                        str += '  ' + err.message
+                        console.error(err)
+                    }
+
+                    document.getElementById('binAsJson').innerHTML += str + '\n\n';
+                });
+
+            }
+
+            function hex2ab (hex) {
+            if (typeof hex !== 'string') {
+                throw new TypeError('Input must be string, was ' + typeof hex)
+            }
+            hex = hex.trim()
+            if (hex.length % 2 !== 0) {
+                throw new RangeError('String length must be even')
+            }
+            if (hex.substring(0,2) === '0x') {
+                hex = hex.substring(2, hex.length)
+            }
+
+            let arr = []
+            for (let i = 0; i < hex.length; i += 2) {
+                arr.push(parseInt(hex.substring(i, i+2), 16))
+            }
+            return new Uint8Array(arr).buffer
+        }
+        </script>
+        <style>
+            label { font-weight: bold; }
+            html, body, .container-fluid {
+                height: 100%;
+                min-height: 100%;
+            }
+            textarea.form-control {
+                width: 100%;
+                font-size: 10pt;
+                font-family:monospace;
+            }
+        </style>
+
+    </head>
+    <body onload="start()">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12 jumbotron text-center">
+                    <h1>Binson Visualizer</h1>
+                    <p>Enter a hexstring representation of a binson object to see it as JSON.</p> 
+                </div>
+            </div>
+            <div class="row">
+                <div class="section col-lg-6">
+                    <label for="binBytes">Input:</label>
+                    <textarea rows="25" class="form-control" id="binBytes" oninput="visualize()">
+                    </textarea>
+                </div>
+                <div class="section col-lg-6">
+                    <label for="binAsJson">Output:</label>
+                    <textarea rows="25" readonly class="form-control" id="binAsJson"></textarea>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3" style="margin-top: 10pt">
+                    <button type="button" class="btn btn-primary" onClick="setVisualizer(visualizeBinson)">
+                        Binson
+                    </button>
+                    <button type="button" class="btn btn-primary" onClick="setVisualizer(visualizeCArray)">
+                        C-Array
+                    </button>
+                    <button type="button" class="btn btn-primary" onClick="setVisualizer(visualizeSwiftArray)">
+                        Swift-Array
+                    </button>
+                    <button type="button" class="btn btn-primary" onClick="setVisualizer(charString)">
+                        Char-String
+                    </button>
+                </div>
+            </div>
+        </div>
+    </body>
 
 </html>
