@@ -839,7 +839,7 @@ Binson.prototype.toJson = function toJson(indent = 0) {
 function valueToJson(value, indent) {
 	let str = ''
 	if (typeof value === 'string') {
-		str += '"' + value + '"'
+		str += '"' + escapeSpecialChars(value) + '"'
 	} else if (value instanceof ArrayBuffer) {
 		str += '"0x' + ab2str(value) + '"'
 	} else if (value instanceof Binson) {
@@ -871,6 +871,18 @@ function arrayToJson(arr, indent) {
 	str += '\n'
 	str += indentation + ']'
 	return str
+}
+
+function escapeSpecialChars(str) {
+    return str
+        .replace(/[\\]/g, '\\\\')
+        .replace(/[\"]/g, '\\\"')
+        .replace(/[\/]/g, '\\/')
+        .replace(/[\b]/g, '\\b')
+        .replace(/[\f]/g, '\\f')
+        .replace(/[\n]/g, '\\n')
+        .replace(/[\r]/g, '\\r')
+        .replace(/[\t]/g, '\\t');
 }
 
 function ab2str(ab) {
