@@ -7,6 +7,7 @@ data serialization format; see [binson.org](http://binson.org/).
 Table of Contents
 =================
 * [Status](#status)
+* [Visualizer](#visualizer)
 * [Usage](#usage)
   * [Adding binson-js to your project](#adding-binson-js-to-your-project)
   * [Creating Binson objects](#creating-binson-objects)
@@ -43,6 +44,13 @@ binson.js currently support positive integers up to and including
 Number.MAX_SAFE_INTEGER (2^53-1). It is possible to use both putInteger
 and to parse integers up to that size. There is currently NO SUPPORT for negative
 numbers that does not fit in 32 bits.
+
+Visualizer
+==========
+
+Here is a handy dandy Binson visualizer. Just paste hex strings into the text box and get a human readable string or a C array or a Swift array etc.
+
+http://assaabloy-ppi.github.io/binson-js/ 
 
 Usage
 =====
