@@ -1,5 +1,7 @@
-let TextEncoder = require('./../lib/encoding.js')['TextEncoder']
-let TextDecoder = require('./../lib/encoding.js')['TextDecoder']
+// Dependencies added for compatibility with Node.js older than 11.0.0
+// To be removed once Node.js 12.0.0 becomes LTS
+let {TextEncoder} = typeof module !== 'undefined' && module.exports ? require('util') : {TextEncoder : self.TextEncoder};
+let {TextDecoder} = typeof module !== 'undefined' && module.exports ? require('util') : {TextDecoder: self.TextDecoder};
 
 // ======== Header =========
 // Binson implementation in JavaScript.
@@ -22,7 +24,7 @@ let TextDecoder = require('./../lib/encoding.js')['TextDecoder']
 
 
 // ======== Binson object ========
-function Binson() {
+export default function Binson() {
 	if (!(this instanceof Binson)) {
 		return new Binson()
 	}
@@ -906,8 +908,6 @@ Binson.prototype.equals = function equals(bin) {
 Binson.fromBytes = function fromBytes(buffer, offset = 0) {
 	return parse(buffer, offset)
 }
-
-module.exports = Binson
 
 //
 // ======== BinsonParser object ========

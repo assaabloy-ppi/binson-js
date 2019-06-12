@@ -1,4 +1,4 @@
-var Binson = require('./../src/binson.js')
+import Binson from './../src/binson.js';
 
 
 // Tests for binson.js.
