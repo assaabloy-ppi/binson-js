@@ -28,9 +28,11 @@ Table of Contents
 Status
 ======
 
-2017-11-15. Improve error messages
+2019-06-11. Converted from CommonJS module into ES6 module. Removed public domain lib dependency.
 
-2017-10-27. Add methods toJoson() and equals()
+2017-11-15. Improve error messages.
+
+2017-10-27. Add methods toJson() and equals()
 
 2017-10-19. Update to use module.exports. Use public domain lib to do UTF-8 encoding and decoding.
 
@@ -59,9 +61,9 @@ Usage
 Adding binson-js to your project
 --------------------------------
 
-Include js/src and js/lib folders in your project and include binson using require
+Include binson.js in your project and include Binson using import
 
-    var Binson = require('./path/to/binson.js')
+    import Binson from './path/to/binson.js';
 
 See js/src-test/ for more detailed examples of how to use binson.js
 
@@ -100,14 +102,14 @@ Returns an ArrayBuffer with a serialized Binson object.
 Deserializing Binson objects
 ----------------------------
 
-#### Binson.parse(buffer [, offset])
+#### Binson.fromBytes(buffer [, offset])
 
 Returns a Binson object. The offset argument is optional, if omitted
 parsing starts at the beginning of the ArrayBuffer. Throws an error
 if the buffer could not be parsed.
 
-    var bin = Binson.parse(buff)
-    var bin = Binson.parse(buff, offset)
+    var bin = Binson.fromBytes(buff)
+    var bin = Binson.fromBytes(buff, offset)
 
 
 Getting the byte size of Binson objects
@@ -336,9 +338,11 @@ Returns true if and only if *bin* is a Binson object and serializes to the exact
 For binson-js developers
 ========================
 
-To run the tests
+To run the tests 
 
-    node js/src-test/tests.js
+    node -r esm js/src-test/tests.js
+    
+At least Node.js version 8.3.0 with [esm](https://github.com/standard-things/esm) is required.
 
 Requirements
 ------------
