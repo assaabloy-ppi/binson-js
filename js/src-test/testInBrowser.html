@@ -4,11 +4,12 @@
         <title>Testing</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <script src="./tape.js"></script>
-        <script type="module" src="./binsontests.js"></script>
-        <script type="module" src="./binsonparsertests.js"></script>
-        <script type="text/javascript">
+        <script type="module" type="text/javascript">
+            import "./binsontests.js";
+            import "./binsonparsertests.js";
+
             let oldLogger = console.log;
-            let logger;
+            let logger = document.getElementById('log');
             let buffer = [];
 
             function printToPage(message){
@@ -25,10 +26,6 @@
                 }
             }
 
-            function init(){
-                logger = document.getElementById('log');
-            }
-
             (function () {
                 console.log = function (message) {
                     oldLogger(message);
@@ -37,7 +34,7 @@
             })();
         </script>
     </head>
-    <body onload="init()">
+    <body>
         <p>Testing<br>
         <pre id='log'></pre>
     </body>
