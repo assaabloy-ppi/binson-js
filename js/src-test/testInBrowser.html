@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Testing</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <script src="./tape.js"></script>
+        <script type="module" src="./binsontests.js"></script>
+        <script type="module" src="./binsonparsertests.js"></script>
+        <script type="text/javascript">
+            let oldLogger = console.log;
+            let logger;
+            let buffer = [];
+
+            function printToPage(message){
+                buffer = buffer.concat(message);
+                if (logger !== undefined){
+                    for (let i = 0; i < buffer.length; i++){
+                        if (typeof buffer[i] == 'object') {
+                            logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(buffer[i], undefined, 2) : buffer[i]) + '<br/>';
+                        } else {
+                            logger.innerHTML += buffer[i] + '<br/>';
+                        }
+                    }
+                    buffer = [];
+                }
+            }
+
+            function init(){
+                logger = document.getElementById('log');
+            }
+
+            (function () {
+                console.log = function (message) {
+                    oldLogger(message);
+                    printToPage(message)
+                }
+            })();
+        </script>
+    </head>
+    <body onload="init()">
+        <p>Testing<br>
+        <pre id='log'></pre>
+    </body>
+</html>
