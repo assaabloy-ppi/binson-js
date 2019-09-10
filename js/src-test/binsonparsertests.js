@@ -469,8 +469,6 @@ test('ParseInt64Pos', function(t) {
 	let binB = Binson.fromBytes(arrayToBuffer(expectedB));
 	let binC = Binson.fromBytes(arrayToBuffer(expectedC));
 
-	t.plan(6)
-
 	bigIntEqual(t, binA.getBigInt("i"), int53Max);
 	bigIntEqual(t, binB.getBigInt("i"), int53Over);
 	bigIntEqual(t, binC.getBigInt("i"), int64Max);
@@ -479,7 +477,7 @@ test('ParseInt64Pos', function(t) {
 	t.throws(() => binB.getInteger('i'), "Can not get integer if not fit in Number");
 	t.throws(() => binC.getInteger('i'), "Can not get integer if not fit in Number");
 
-	//t.end();
+	t.end();
 });
 
 test('ParseInt64Neg', function(t) {
