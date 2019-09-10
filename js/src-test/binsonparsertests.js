@@ -10,7 +10,7 @@ const test = typeof module !== 'undefined' && module.exports ? require('./tape.j
 
 // ======== Functions ========
 function arrayToBuffer(array) {
-    const uints = new Uint8Array(array)
+    const uints = new Uint8Array(array);
     return uints.buffer;
 }
 
@@ -472,8 +472,8 @@ test('ParseInt64Pos', function(t) {
 	const a = 8070451082003742720;
 	const bufferA = arrayToBuffer(expectedA);
 	let bin = Binson.fromBytes(bufferA, 0);
-	let bigInt = bin.getBigInt("a")
-	t.deepEqual(bigInt, jsbi.BigInt(a))
+	let bigInt = bin.getBigInt("a");
+	t.deepEqual(bigInt, jsbi.BigInt(a));
 
 	t.end();
 });
@@ -486,8 +486,8 @@ test('ParseInt64Neg', function(t) {
 	const a = -2147483649;
 	const bufferA = arrayToBuffer(expectedA);
 	let bin = Binson.fromBytes(bufferA, 0);
-	let bigInt = bin.getBigInt("a")
-	t.deepEqual(bigInt, jsbi.BigInt(a))
+	let bigInt = bin.getBigInt("a");
+	t.deepEqual(bigInt, jsbi.BigInt(a));
 
 	t.end();
 });
@@ -1000,8 +1000,8 @@ test('ParseArrayInt64Pos', function(t) {
 	const bufferA = arrayToBuffer(expectedA);
 
 	let bin = Binson.fromBytes(bufferA, 0);
-	let bigInt = bin.getBigInt("a")
-	t.deepEqual(bigInt, jsbi.BigInt(a))
+	let bigInt = bin.getBigInt("a");
+	t.deepEqual(bigInt, jsbi.BigInt(a));
 
 	t.end();
 });
@@ -1016,8 +1016,8 @@ test('ParseArrayInt64Neg', function(t) {
 	const bufferA = arrayToBuffer(expectedA);
 
 	let bin = Binson.fromBytes(bufferA, 0);
-	let bigInt = bin.getBigInt("a")
-	t.deepEqual(bigInt, jsbi.BigInt(a))
+	let bigInt = bin.getBigInt("a");
+	t.deepEqual(bigInt, jsbi.BigInt(a));
 
 	t.end();
 });
@@ -1634,7 +1634,7 @@ test('ParseObjectInteger', function(t) {
 	if (!(parsedAbin instanceof Binson)) {
 		throw new Error("unexpected type. \n\t" +
 					"Expected: Binson\n\t" +
-					"Parsed: " + parsedA);
+					"Parsed: " + typeof(parsedAbin));
 	}
 
 	const parsedAbinInt = parsedAbin.get("a");
