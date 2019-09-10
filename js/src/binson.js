@@ -363,14 +363,11 @@ Binson.prototype._valueSize = function(value) {
 }
 
 // ToDo clean upp comment
-// We don't handle 64-bit integers at this moment
-// Integers that don't fit into 32-bit raises an error
+// JS Number don't handle 64-bit integers. binson.js uses Big Integers
+// (jsbi.js) in those cases. Integers that don't fit into Number raises an error
 Binson.prototype._ensureIntegerPrecision = function(integer) {
 	if (this._integerSize(integer) > 4) {
-		if (integer <= Number.MAX_SAFE_INTEGER && integer > 0) {
-
-			return
-		} else {
+		if ( integer < Number.MIN_SAFE_INTEGER || Number.MAX_SAFE_INTEGER < integer) {
 			throw new Error('specified integer does not fit in 32 bits.\n\t' +
 					'Integer: ' + integer)
 		}
@@ -595,12 +592,11 @@ Binson.prototype.putInteger = function putInteger(name, value) {
 }
 
 Binson.prototype.getInteger = function getInteger(name) {
-	return jsbi.toNumber(this.getBigInt(name));
 	let f = this._fields[name]
 	if (f === undefined) {
 		return undefined
 	} else if (f.type === 'integer') {
-		this._ensureIntegerPrecision(value) // ToDo Is check needed?
+		this._ensureIntegerPrecision(f.value) // ToDo Is check needed?
 		return f.value
 	}
 	else if (f.type === 'bigInt') {

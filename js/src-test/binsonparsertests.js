@@ -18,6 +18,24 @@ function bufferToArray(buffer) {
 	return new Uint8Array(buffer);
 }
 
+function tryGetInteger(binson, name){
+	try{
+		binson.getInteger(name);
+		return true;
+	} catch (e) {
+		return false;
+	}
+}
+
+function bigIntEqual(t, dut, expected){
+	if (jsbi.equal(dut, expected)){
+		t.pass("Big Integers are the same");
+	}
+	else {
+		t.fail("Big Integers are not the same\n\texpected: " + expected.toString() + "\n\tactual:   " + dut.toString());
+	}
+}
+
 //
 // ======== BinsonParserTest object ========
 //
@@ -447,47 +465,50 @@ test('ParseInt32', function(t) {
 	t.end();
 });
 
-test('ParseInt53', function(t) {
-	const a = 9007199254740991;
-	const expectedA = [0x40, 0x14, 0x01, 0x61, 0x13, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x1F, 0x00, 0x41];
-	const bufferA = arrayToBuffer(expectedA);
-	const binA = Binson.fromBytes(bufferA, 0);
-	const parsedA = binA.getInteger("a");
-	if (typeof(parsedA) !== "number") {
-		throw new Error("unexpected type, " + typeof(parsedA) + ", " + parsedA);
-	}
-	if (a !== parsedA) {
-		throw new Error("unexpected value.\n\t" +
-					"Expected: " + a + "\n\t" +
-					"Parsed: " + parsedA);
-	}
-
-	t.end();
-});
-
 test('ParseInt64Pos', function(t) {
-	// TODO: When there are 64-bit integers
-	const expectedA = [0x40, 0x14, 0x01, 0x61, 0x13,
-		0x00, 0x00, 0x00, 0x80, 0x81, 0x00, 0x00, 0x01, 0x41];
-	const a = 8070451082003742720;
-	const bufferA = arrayToBuffer(expectedA);
-	let bin = Binson.fromBytes(bufferA, 0);
-	let bigInt = bin.getBigInt("a");
-	t.deepEqual(bigInt, jsbi.BigInt(a));
+	const int53Max = jsbi.BigInt(Number.MAX_SAFE_INTEGER);
+	const int53Over = jsbi.add(int53Max, jsbi.BigInt(1));
+	const int64Max = jsbi.BigInt('9223372036854775807');
+
+	const expectedA = [0x40, 0x14, 0x01, 0x69, 0x13, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x1f, 0x00, 0x41];
+	const expectedB = [0x40, 0x14, 0x01, 0x69, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x41];
+	const expectedC = [0x40, 0x14, 0x01, 0x69, 0x13, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f, 0x41];
+
+	let binA = Binson.fromBytes(arrayToBuffer(expectedA));
+	let binB = Binson.fromBytes(arrayToBuffer(expectedB));
+	let binC = Binson.fromBytes(arrayToBuffer(expectedC));
+
+	bigIntEqual(t, binA.getBigInt("i"), int53Max);
+	bigIntEqual(t, binB.getBigInt("i"), int53Over);
+	bigIntEqual(t, binC.getBigInt("i"), int64Max);
+
+	t.deepEqual(binA.getInteger("i"), Number.MAX_SAFE_INTEGER);
+	t.false(tryGetInteger(binB, 'i'), "Can not get integer if not fit in Number");
+	t.false(tryGetInteger(binC, 'i'), "Can not get integer if not fit in Number");
 
 	t.end();
 });
 
-// Throws error! 64-bit integers are not implemented!
 test('ParseInt64Neg', function(t) {
-	// TODO: When there are 64-bit integers
-	const expectedA = [0x40, 0x14, 0x01, 0x61, 0x13,
-		0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0x41];
-	const a = -2147483649;
-	const bufferA = arrayToBuffer(expectedA);
-	let bin = Binson.fromBytes(bufferA, 0);
-	let bigInt = bin.getBigInt("a");
-	t.deepEqual(bigInt, jsbi.BigInt(a));
+	const int53Min = jsbi.BigInt(Number.MIN_SAFE_INTEGER);
+	const int53Under = jsbi.subtract(int53Min, jsbi.BigInt(1));
+	const int64Min = jsbi.BigInt('-9223372036854775808');
+
+	const expectedA = [0x40, 0x14, 0x01, 0x69, 0x13, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe0, 0xff, 0x41];
+	const expectedB = [0x40, 0x14, 0x01, 0x69, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe0, 0xff, 0x41];
+	const expectedC = [0x40, 0x14, 0x01, 0x69, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x41];
+
+	let binA = Binson.fromBytes(arrayToBuffer(expectedA));
+	let binB = Binson.fromBytes(arrayToBuffer(expectedB));
+	let binC = Binson.fromBytes(arrayToBuffer(expectedC));
+
+	bigIntEqual(t, binA.getBigInt("i"), int53Min);
+	bigIntEqual(t, binB.getBigInt("i"), int53Under);
+	bigIntEqual(t, binC.getBigInt("i"), int64Min);
+
+	t.deepEqual(binA.getInteger("i"), Number.MIN_SAFE_INTEGER);
+	t.false(tryGetInteger(binB, 'i'), "Can not get integer if not fit in Number");
+	t.false(tryGetInteger(binC, 'i'), "Can not get integer if not fit in Number");
 
 	t.end();
 });
