@@ -23,6 +23,8 @@ let {TextDecoder} = typeof module !== 'undefined' && module.exports ? require('u
 // for internal use only.
 //
 
+const MIN_SAFE_INT64_BIGINT  = jsbi.BigInt('-9223372036854775808');
+const MAX_SAFE_INT64_BIGINT  = jsbi.BigInt('9223372036854775807');
 const MIN_SAFE_INTEGER_BIGINT = jsbi.BigInt(Number.MIN_SAFE_INTEGER);
 const MAX_SAFE_INTEGER_BIGINT = jsbi.BigInt(Number.MAX_SAFE_INTEGER);
 
@@ -363,7 +365,6 @@ Binson.prototype._valueSize = function(value) {
 	return size
 }
 
-// ToDo clean upp comment
 // JS Number don't handle 64-bit integers. binson.js uses Big Integers
 // (jsbi.js) in those cases. Integers that don't fit into Number raises an error
 Binson.prototype._ensureIntegerPrecision = function(integer) {
@@ -375,13 +376,20 @@ Binson.prototype._ensureIntegerPrecision = function(integer) {
 	}
 }
 
+Binson.prototype._ensureBigIntPrecision = function(bigInt) {
+	if ( bigInt < MIN_SAFE_INT64_BIGINT || MAX_SAFE_INT64_BIGINT < bigInt) {
+		throw new Error('specified integer does not fit in 64 bits.\n\t' +
+			'BigInt: ' + bigInt)
+	}
+}
+
 // Returns the binson type of a variable
 Binson.prototype._binsonTypeOf = function(v) {
 	let type = typeof v
 	switch (type) {
 			case 'boolean':
 				return 'boolean'
-			case 'number': ///ToDo
+			case 'number':
 				if (Number.isInteger(v)) {
 					this._ensureIntegerPrecision(v)
 					return 'integer'
@@ -392,6 +400,7 @@ Binson.prototype._binsonTypeOf = function(v) {
 				return 'string'
 			case 'object':
 				if (jsbi.__isBigInt(v)) {
+					this._ensureBigIntPrecision(v)
 					return 'bigInt'
 				}
 				if (Array.isArray(v)) {
@@ -597,11 +606,10 @@ Binson.prototype.getInteger = function getInteger(name) {
 	if (f === undefined) {
 		return undefined
 	} else if (f.type === 'integer') {
-		this._ensureIntegerPrecision(f.value) // ToDo Is check needed?
 		return f.value
 	}
 	else if (f.type === 'bigInt') {
-		const intNumber = jsbi.BigInt.toNumber()
+		const intNumber = jsbi.toNumber(f.value)
 		this._ensureIntegerPrecision(intNumber)
 		return intNumber
 	}
@@ -618,10 +626,10 @@ Binson.prototype.hasInteger = function hasInteger(name) {
 
 // BIG INTEGER
 Binson.prototype.putBigInt = function putBigInt(name, value) {
-	if (! value instanceof jsbi.BigInt) {
+	if (! jsbi.__isBigInt(value)) {
 		throw new Error('putBigInt expected an jsbi.BigInt')
 	}
-	// ToDo Add check. Not bigger thn 64bit
+	this._ensureBigIntPrecision(value)
 	this._put('bigInt', name, value)
 	return this
 }

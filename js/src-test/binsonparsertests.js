@@ -18,15 +18,6 @@ function bufferToArray(buffer) {
 	return new Uint8Array(buffer);
 }
 
-function tryGetInteger(binson, name){
-	try{
-		binson.getInteger(name);
-		return true;
-	} catch (e) {
-		return false;
-	}
-}
-
 function bigIntEqual(t, dut, expected){
 	if (jsbi.equal(dut, expected)){
 		t.pass("Big Integers are the same");
@@ -478,15 +469,17 @@ test('ParseInt64Pos', function(t) {
 	let binB = Binson.fromBytes(arrayToBuffer(expectedB));
 	let binC = Binson.fromBytes(arrayToBuffer(expectedC));
 
+	t.plan(6)
+
 	bigIntEqual(t, binA.getBigInt("i"), int53Max);
 	bigIntEqual(t, binB.getBigInt("i"), int53Over);
 	bigIntEqual(t, binC.getBigInt("i"), int64Max);
 
 	t.deepEqual(binA.getInteger("i"), Number.MAX_SAFE_INTEGER);
-	t.false(tryGetInteger(binB, 'i'), "Can not get integer if not fit in Number");
-	t.false(tryGetInteger(binC, 'i'), "Can not get integer if not fit in Number");
+	t.throws(() => binB.getInteger('i'), "Can not get integer if not fit in Number");
+	t.throws(() => binC.getInteger('i'), "Can not get integer if not fit in Number");
 
-	t.end();
+	//t.end();
 });
 
 test('ParseInt64Neg', function(t) {
@@ -507,8 +500,8 @@ test('ParseInt64Neg', function(t) {
 	bigIntEqual(t, binC.getBigInt("i"), int64Min);
 
 	t.deepEqual(binA.getInteger("i"), Number.MIN_SAFE_INTEGER);
-	t.false(tryGetInteger(binB, 'i'), "Can not get integer if not fit in Number");
-	t.false(tryGetInteger(binC, 'i'), "Can not get integer if not fit in Number");
+	t.throws(() => binB.getInteger('i'), "Can not get integer if not fit in Number");
+	t.throws(() => binC.getInteger('i'), "Can not get integer if not fit in Number");
 
 	t.end();
 });
@@ -1010,7 +1003,6 @@ test('ParseArrayInt32', function(t) {
 	t.end();
 });
 
-// Throws error! 64-bit integers are not implemented!
 test('ParseArrayInt64Pos', function(t) {
 	const int53Max = jsbi.BigInt(Number.MAX_SAFE_INTEGER);
 	const int53Over = jsbi.add(int53Max, jsbi.BigInt(1));
@@ -1031,7 +1023,6 @@ test('ParseArrayInt64Pos', function(t) {
 	t.end();
 });
 
-// Throws error! 64-bit integers are not implemented!
 test('ParseArrayInt64Neg', function(t) {
 	const int53Min = jsbi.BigInt(Number.MIN_SAFE_INTEGER);
 	const int53Under = jsbi.subtract(int53Min, jsbi.BigInt(1));
