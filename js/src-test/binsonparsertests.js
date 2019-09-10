@@ -1,4 +1,5 @@
 import Binson from './../src/binson.js';
+import jsbi from './../lib/jsbi.mjs';
 const test = typeof module !== 'undefined' && module.exports ? require('./tape.js') : self.test;
 
 // Tests for binson.js.
@@ -470,17 +471,9 @@ test('ParseInt64Pos', function(t) {
 		0x00, 0x00, 0x00, 0x80, 0x81, 0x00, 0x00, 0x01, 0x41];
 	const a = 8070451082003742720;
 	const bufferA = arrayToBuffer(expectedA);
-	let bin;
-    let exception = false;
-	try {
-		bin = Binson.fromBytes(bufferA, 0);
-	} catch (err) {
-		exception = true;
-	}
-	if (!exception) {
-		console.log(bin.getInteger("a"));
-		throw new Error("Able to parse 64 bit integer");
-	}
+	let bin = Binson.fromBytes(bufferA, 0);
+	let bigInt = bin.getBigInt("a")
+	t.deepEqual(bigInt, jsbi.BigInt(a))
 
 	t.end();
 });
@@ -492,16 +485,9 @@ test('ParseInt64Neg', function(t) {
 		0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0x41];
 	const a = -2147483649;
 	const bufferA = arrayToBuffer(expectedA);
-
-    let exception = false;
-	try {
-		Binson.fromBytes(bufferA, 0);
-	} catch (err) {
-		exception = true;
-	}
-	if (!exception) {
-		throw new Error("Able to put 64 bit integer");
-	}
+	let bin = Binson.fromBytes(bufferA, 0);
+	let bigInt = bin.getBigInt("a")
+	t.deepEqual(bigInt, jsbi.BigInt(a))
 
 	t.end();
 });
@@ -1013,15 +999,9 @@ test('ParseArrayInt64Pos', function(t) {
 	const a = 1161928703861587967;
 	const bufferA = arrayToBuffer(expectedA);
 
-	let exception = false;
-	try {
-		Binson.fromBytes(bufferA, 0);
-	} catch (err) {
-		exception = true;
-	}
-	if (!exception) {
-		throw new Error("Able to parse 64 bit integer element in array");
-	}
+	let bin = Binson.fromBytes(bufferA, 0);
+	let bigInt = bin.getBigInt("a")
+	t.deepEqual(bigInt, jsbi.BigInt(a))
 
 	t.end();
 });
@@ -1035,15 +1015,9 @@ test('ParseArrayInt64Neg', function(t) {
 	const a = -2147483649;
 	const bufferA = arrayToBuffer(expectedA);
 
-    let exception = false;
-	try {
-		Binson.fromBytes(bufferA, 0);
-	} catch (err) {
-		exception = true;
-	}
-	if (!exception) {
-		throw new Error("Able to put undefined element in array");
-	}
+	let bin = Binson.fromBytes(bufferA, 0);
+	let bigInt = bin.getBigInt("a")
+	t.deepEqual(bigInt, jsbi.BigInt(a))
 
 	t.end();
 });

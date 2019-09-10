@@ -1,3 +1,5 @@
+import jsbi from './../lib/jsbi.mjs';
+
 // Dependencies added for compatibility with Node.js older than 11.0.0
 // To be removed once Node.js 12.0.0 becomes LTS
 let {TextEncoder} = typeof module !== 'undefined' && module.exports ? require('util') : {TextEncoder : self.TextEncoder};
@@ -21,7 +23,7 @@ let {TextDecoder} = typeof module !== 'undefined' && module.exports ? require('u
 // for internal use only.
 //
 
-
+const MAX_SAFE_INTEGER_BIGINT = jsbi.BigInt(Number.MAX_SAFE_INTEGER);
 
 // ======== Binson object ========
 export default function Binson() {
@@ -56,6 +58,9 @@ Binson.prototype._valueToBytes = function(bytes, offset, value) {
 		case 'integer':
 			offset = this._integerToBytes(bytes, offset, value.value)
 			break
+		case 'bigInt':
+			offset = this._bigIntToBytes(bytes, offset, value.value)
+			break
 		case 'double':
 			offset = this._doubleToBytes(bytes, offset, value.value)
 			break
@@ -89,6 +94,9 @@ Binson.prototype._arrayToBytes = function(bytes, offset, array) {
 			case 'integer':
 				offset = this._integerToBytes(bytes, offset, elem)
 				break
+			case 'bigInt':
+				offset = this._bigIntToBytes(bytes, offset, elem)
+				break
 			case 'object':
 				offset = this._objectToBytes(bytes, offset, elem)
 				break
@@ -110,45 +118,32 @@ Binson.prototype._doubleToBytes = function(bytes, offset, double) {
 	return offset
 }
 
-Binson.prototype._integerToBytes = function(bytes, offset, integer) {
-	let size = this._integerSize(integer)
+Binson.prototype._integerToBytes = function(bytes, offset, value) {
+	// ToDo
+	return this._bigIntToBytes(bytes, offset, jsbi.BigInt(value))
+}
+
+Binson.prototype._bigIntToBytes = function(bytes, offset, value) {
+	let size = this._bigIntSize(value)
 	if (size == 1) {
 		bytes.setUint8(offset, 0x10)
-		offset += 1
-		bytes.setInt8(offset, integer)
-		offset += 1
 	} else if (size == 2) {
 		bytes.setUint8(offset, 0x11)
-		offset += 1
-		bytes.setInt16(offset, integer, true)
-		offset += 2
 	} else if (size == 4) {
 		bytes.setUint8(offset, 0x12)
-		offset += 1
-		bytes.setInt32(offset, integer, true)
-		offset += 4
 	} else if (size == 8) {
-		// TODO: Handle 64-bit integers
-		// Currently stops too large integers in putInteger with
-		// _ensureIntegerPrecision which only accepts negative integers
-		// that fit in 4 bytes and positive integers < 9007199254740991
 		bytes.setUint8(offset, 0x13)
-		offset += 1
-		for (let i = 0; i < size; i++) {
-			let byte = integer & 0xFF
-			bytes.setUint8(offset, byte)
-			offset += 1
-			// Bitshift right 8 bits
-			for (let j = 0; j < 8; j++) {
-				if (integer & 1 === 1) {
-					integer -= 1
-				}
-				integer = integer/2
-			}
-		}
 	} else {
 		throw new Error('this._integerSize returned bad bytesize: ' + size)
 	}
+	offset += 1
+	for (let i = 0; i < size; i++) {
+		let byte = value & 0xFF
+		bytes.setUint8(offset, byte)
+		offset += 1
+		value = jsbi.signedRightShift(value, jsbi.BigInt(8))
+	}
+
 	return offset
 }
 
@@ -283,6 +278,9 @@ Binson.prototype._arraySize = function(array) {
 			case 'integer':
 				size += 1 + this._integerSize(elem)
 				break
+			case 'bigInt':
+				size += 1 + this._bigIntSize(elem)
+				break
 			case 'object':
 				size += this._objectSize(elem)
 				break
@@ -309,6 +307,10 @@ Binson.prototype._bytesSize = function(bytes) {
 	return 1 + this._integerSize(len) + len
 }
 
+Binson.prototype._bigIntSize = function(int) {
+	return this._integerSize(jsbi.toNumber(int))
+}
+
 Binson.prototype._integerSize = function(int) {
 	let size = 8
 	if (int >= -2147483648 && int <= 2147483647) {
@@ -321,6 +323,10 @@ Binson.prototype._integerSize = function(int) {
 		size = 1
 	}
 	return size
+}
+
+Binson.prototype._bigIntSize = function(bigInt) {
+	return this._integerSize(jsbi.toNumber(bigInt))
 }
 
 // value.type
@@ -343,6 +349,9 @@ Binson.prototype._valueSize = function(value) {
 		case 'integer':
 			size += 1 + this._integerSize(value.value) // int hex id + int8/16/32/64 size
 			break
+		case 'bigInt':
+			size += 1 + this._bigIntSize(value.value) // int hex id + int8/16/32/64 size
+			break
 		case 'double':
 			size += 1 + 8					// double hex id + size of 64-bit float
 			break
@@ -353,11 +362,13 @@ Binson.prototype._valueSize = function(value) {
 	return size
 }
 
+// ToDo clean upp comment
 // We don't handle 64-bit integers at this moment
 // Integers that don't fit into 32-bit raises an error
 Binson.prototype._ensureIntegerPrecision = function(integer) {
 	if (this._integerSize(integer) > 4) {
-		if (integer <= 9007199254740991 && integer > 0) {
+		if (integer <= Number.MAX_SAFE_INTEGER && integer > 0) {
+
 			return
 		} else {
 			throw new Error('specified integer does not fit in 32 bits.\n\t' +
@@ -372,7 +383,7 @@ Binson.prototype._binsonTypeOf = function(v) {
 	switch (type) {
 			case 'boolean':
 				return 'boolean'
-			case 'number':
+			case 'number': ///ToDo
 				if (Number.isInteger(v)) {
 					this._ensureIntegerPrecision(v)
 					return 'integer'
@@ -390,6 +401,9 @@ Binson.prototype._binsonTypeOf = function(v) {
 				}
 				if (v instanceof Binson) {
 					return 'object'
+				}
+				if (v instanceof jsbi.BigInt) {
+					return 'integer'
 				}
 				if (v == null) {
 					throw new Error('Binson does not allow null')
@@ -577,28 +591,67 @@ Binson.prototype.putInteger = function putInteger(name, value) {
 		throw new Error('putInteger expected an integer')
 	}
 	this._ensureIntegerPrecision(value)
-	this._put('integer', name, value)
-	return this
+	return this._put('integer', name, value);
 }
 
 Binson.prototype.getInteger = function getInteger(name) {
-let f = this._fields[name]
+	return jsbi.toNumber(this.getBigInt(name));
+	let f = this._fields[name]
 	if (f === undefined) {
 		return undefined
-	} else if (f.type !== 'integer') {
-		return undefined
+	} else if (f.type === 'integer') {
+		this._ensureIntegerPrecision(value) // ToDo Is check needed?
+		return f.value
 	}
-	return f.value
+	else if (f.type === 'bigInt') {
+		const intNumber = jsbi.BigInt.toNumber()
+		this._ensureIntegerPrecision(intNumber)
+		return intNumber
+	}
+	return undefined
+
 }
 
 Binson.prototype.hasInteger = function hasInteger(name) {
+	return this.hasBigInt(name)
+}
+
+
+
+
+// BIG INTEGER
+Binson.prototype.putBigInt = function putBigInt(name, value) {
+	if (! value instanceof jsbi.BigInt) {
+		throw new Error('putBigInt expected an jsbi.BigInt')
+	}
+	// ToDo Add check. Not bigger thn 64bit
+	this._put('bigInt', name, value)
+	return this
+}
+
+Binson.prototype.getBigInt = function getBigInt(name) {
+	let f = this._fields[name]
+	if (f === undefined) {
+		return undefined
+	} else if (f.type === 'integer') {
+		return jsbi.BigInt(f.value);
+	}
+	else if (f.type === 'bigInt') {
+		return f.value
+	}
+	return undefined
+}
+
+Binson.prototype.hasBigInt = function hasBigInt(name) {
 	let f = this._fields[name]
 	if (f === undefined) {
 		return false
-	} else if (f.type !== 'integer') {
-		return false
+	} else if (f.type === 'integer') {
+		return true
+	} else if (f.type === 'bigInt') {
+		return true
 	}
-	return true
+	return false
 }
 
 
@@ -1057,44 +1110,23 @@ function parse(buffer, offset) {
 
 		switch(b) {
 			case 0x10:
-				result = view.getInt8(offset)
+				result = innerParseBigInt(1)
 				offset += 1
 				break
 
 			case 0x11:
-				result = view.getInt16(offset, true)
+				result = innerParseBigInt(2)
 				offset += 2
 				break
 
 			case 0x12:
-				result = view.getInt32(offset, true)
+				result = innerParseBigInt(4)
 				offset += 4
 				break
 
 			case 0x13:
-				// TODO: Get a 64-bit integer
-				// JavaScript only supports 53 bit integers
-				// binson.js only supports 32 bit integers
-				result = get64BitInteger()
-
-				// It's easy to represent positive 64-bit integers up
-				// to 9007199254740991 so this will have to do
-				// in order to handle unix time in milliseconds
-				if ( 0 < result && result <= 9007199254740991 ) {
-					offset += 8
-				} else {
-					let bytes = ''
-					for (let i = 0; i < 8; i++) {
-						let byte = view.getUint8(offset)
-						if (byte < 16) {
-							bytes += '0'
-						}
-						bytes += byte.toString(16) + ' '
-						offset += 1
-					}
-					throw new Error('JavaScript cannot handle 64-bit integers.\n\t' +
-						'Little-endian bytes: ' + bytes)
-				}
+				result = innerParseBigInt(8)
+				offset += 8
 				break
 
 			default:
@@ -1106,24 +1138,27 @@ function parse(buffer, offset) {
 				break
 		}
 
+		if (jsbi.lessThanOrEqual(result, MAX_SAFE_INTEGER_BIGINT)) {
+			result = jsbi.toNumber(result)
+		}
+
 		return result
 	}
 
-	function get64BitInteger() {
-		let res = 0
-		let bytes = new Uint8Array(8)	// 64-bit is 8 bytes
-		for (let i = 0; i < 8; i++) {
-			bytes[i] = view.getUint8(offset + i)
+	function innerParseBigInt(size) {
+		let res = jsbi.BigInt(0)
+		let multiplier = jsbi.BigInt(1)
+		const BYTE_SIZE = jsbi.BigInt(256)
+		for (let i = 0; i < size ; i++) {
+			let byte = view.getUint8(offset + i )
+			let delta = jsbi.multiply(jsbi.BigInt(byte), multiplier)
+			res = jsbi.add(res, delta)
+			multiplier = jsbi.multiply(multiplier, BYTE_SIZE)
+			if ((i===size-1)&&(byte & 0x80 )){
+				res = jsbi.subtract(res, multiplier)
+			}
 		}
-		// MAX_SAFE_INTEGER is 00 1F FF FF FF FF FF FF
-		// So highest byte must be 0 and second highest
-		// byte must be strictly smaller than 31
-		if (bytes[7] !== 0 || bytes[6] > 31) {
-			return -1
-		}
-		for (let i = 0; i < 8; i++) {
-			res += bytes[i] * Math.pow(2, 8*i)
-		}
+
 		return res
 	}
 
@@ -1172,8 +1207,13 @@ function parse(buffer, offset) {
 		case 0x12:
 		case 0x13:
 			// int8/16/32/64
-			result.type = 'integer'
 			result.value = parseInteger()
+			if (jsbi.__isBigInt(result.value)){
+				result.type = 'bigInt'
+			}
+			else {
+				result.type = 'integer'
+			}
 			break
 
 		case 0x14:
