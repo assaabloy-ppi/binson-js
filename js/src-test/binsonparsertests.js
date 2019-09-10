@@ -1012,33 +1012,42 @@ test('ParseArrayInt32', function(t) {
 
 // Throws error! 64-bit integers are not implemented!
 test('ParseArrayInt64Pos', function(t) {
-	// TODO: When there are 64-bit integers
-	//10 1F FF FF FF FF FF FF
-	const expectedA = [0x40, 0x14, 0x01, 0x61, 0x42,
-		0x13, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x1F, 0x10,
-		0x43, 0x41];
-	const a = 1161928703861587967;
-	const bufferA = arrayToBuffer(expectedA);
+	const int53Max = jsbi.BigInt(Number.MAX_SAFE_INTEGER);
+	const int53Over = jsbi.add(int53Max, jsbi.BigInt(1));
+	const int64Max = jsbi.BigInt('9223372036854775807');
 
-	let bin = Binson.fromBytes(bufferA, 0);
-	let bigInt = bin.getBigInt("a");
-	t.deepEqual(bigInt, jsbi.BigInt(a));
+	const expected = [0x40, 0x14, 0x01, 0x69, 0x42, 0x13, 0xff,
+		  0xff, 0xff, 0xff, 0xff, 0xff, 0x1f, 0x00, 0x13, 0x00,
+		  0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x13, 0xff,
+		  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f, 0x43, 0x41];
+
+	let bin = Binson.fromBytes(arrayToBuffer(expected));
+	let array  = bin.getArray("i");
+
+	t.equal(array[0], Number.MAX_SAFE_INTEGER);
+	bigIntEqual(t, array[1], int53Over);
+	bigIntEqual(t, array[2], int64Max);
 
 	t.end();
 });
 
 // Throws error! 64-bit integers are not implemented!
 test('ParseArrayInt64Neg', function(t) {
-	// TODO: When there are 64-bit integers
-	const expectedA = [0x40, 0x14, 0x01, 0x61, 0x42,
-		0x13, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0xFF,
-		0x43, 0x41];
-	const a = -2147483649;
-	const bufferA = arrayToBuffer(expectedA);
+	const int53Min = jsbi.BigInt(Number.MIN_SAFE_INTEGER);
+	const int53Under = jsbi.subtract(int53Min, jsbi.BigInt(1));
+	const int64Min = jsbi.BigInt('-9223372036854775808');
 
-	let bin = Binson.fromBytes(bufferA, 0);
-	let bigInt = bin.getBigInt("a");
-	t.deepEqual(bigInt, jsbi.BigInt(a));
+	const expected = [0x40, 0x14, 0x01, 0x69, 0x42, 0x13, 0x01,
+		  0x00, 0x00, 0x00, 0x00, 0x00, 0xe0, 0xff, 0x13, 0x00,
+		  0x00, 0x00, 0x00, 0x00, 0x00, 0xe0, 0xff, 0x13, 0x00,
+		  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x43, 0x41];
+
+	let bin = Binson.fromBytes(arrayToBuffer(expected));
+	let array  = bin.getArray("i");
+
+	t.equal(array[0], Number.MIN_SAFE_INTEGER);
+	bigIntEqual(t, array[1], int53Under);
+	bigIntEqual(t, array[2], int64Min);
 
 	t.end();
 });

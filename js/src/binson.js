@@ -23,6 +23,7 @@ let {TextDecoder} = typeof module !== 'undefined' && module.exports ? require('u
 // for internal use only.
 //
 
+const MIN_SAFE_INTEGER_BIGINT = jsbi.BigInt(Number.MIN_SAFE_INTEGER);
 const MAX_SAFE_INTEGER_BIGINT = jsbi.BigInt(Number.MAX_SAFE_INTEGER);
 
 // ======== Binson object ========
@@ -390,6 +391,9 @@ Binson.prototype._binsonTypeOf = function(v) {
 			case 'string':
 				return 'string'
 			case 'object':
+				if (jsbi.__isBigInt(v)) {
+					return 'bigInt'
+				}
 				if (Array.isArray(v)) {
 					return 'array'
 				}
@@ -398,9 +402,6 @@ Binson.prototype._binsonTypeOf = function(v) {
 				}
 				if (v instanceof Binson) {
 					return 'object'
-				}
-				if (v instanceof jsbi.BigInt) {
-					return 'integer'
 				}
 				if (v == null) {
 					throw new Error('Binson does not allow null')
@@ -1134,7 +1135,8 @@ function parse(buffer, offset) {
 				break
 		}
 
-		if (jsbi.lessThanOrEqual(result, MAX_SAFE_INTEGER_BIGINT)) {
+		if (jsbi.greaterThanOrEqual(result, MIN_SAFE_INTEGER_BIGINT) &&
+			jsbi.lessThanOrEqual(result, MAX_SAFE_INTEGER_BIGINT)) {
 			result = jsbi.toNumber(result)
 		}
 
