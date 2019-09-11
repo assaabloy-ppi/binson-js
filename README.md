@@ -340,7 +340,8 @@ For binson-js developers
 
 To run the tests 
 
-    node -r esm js/src-test/tests.js
+    node -r esm js/src-test/binsonparsertests.js
+    node -r esm js/src-test/binsontests.js
     
 At least Node.js version 8.3.0 with [esm](https://github.com/standard-things/esm) is required.
 
