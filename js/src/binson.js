@@ -122,7 +122,6 @@ Binson.prototype._doubleToBytes = function(bytes, offset, double) {
 }
 
 Binson.prototype._integerToBytes = function(bytes, offset, value) {
-	// ToDo
 	return this._bigIntToBytes(bytes, offset, jsbi.BigInt(value))
 }
 
@@ -141,7 +140,7 @@ Binson.prototype._bigIntToBytes = function(bytes, offset, value) {
 	}
 	offset += 1
 	for (let i = 0; i < size; i++) {
-		let byte = value & 0xFF
+		let byte = jsbi.toNumber(jsbi.bitwiseAnd(value, jsbi.BigInt(255)))
 		bytes.setUint8(offset, byte)
 		offset += 1
 		value = jsbi.signedRightShift(value, jsbi.BigInt(8))
@@ -377,7 +376,8 @@ Binson.prototype._ensureIntegerPrecision = function(integer) {
 }
 
 Binson.prototype._ensureBigIntPrecision = function(bigInt) {
-	if ( bigInt < MIN_SAFE_INT64_BIGINT || MAX_SAFE_INT64_BIGINT < bigInt) {
+	if (jsbi.lessThan(bigInt, MIN_SAFE_INT64_BIGINT) ||
+        jsbi.greaterThan(bigInt, MAX_SAFE_INT64_BIGINT)) {
 		throw new Error('specified integer does not fit in 64 bits.\n\t' +
 			'BigInt: ' + bigInt)
 	}

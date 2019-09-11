@@ -1,4 +1,5 @@
 import Binson from './../src/binson.js';
+import jsbi from "../lib/jsbi.mjs";
 const test = typeof module !== 'undefined' && module.exports ? require('./tape.js') : self.test;
 
 // Tests for binson.js.
@@ -359,55 +360,66 @@ test('Int32', function(t) {
 	t.end();
 });
 
-test('Int53', function(t) {
-	const expectedA = [0x40, 0x14, 0x01, 0x61, 0x13, 0x01, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x41];
-	const expectedB = [0x40, 0x14, 0x01, 0x61, 0x13, 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x1F, 0x00, 0x41];
-	const expectedC = [0x40, 0x14, 0x01, 0x61, 0x13, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x1F, 0x00, 0x41];
-
-	const a = 2147483649;
-	const b = 9007199254740990; // Number.MAX_SAFE_INTEGER = 9007199254740991
-	const c = 9007199254740991;
-
-	const binA = new Binson().putInteger("a", a);
-	const binB = new Binson().putInteger("a", b);
-	const binC = new Binson().putInteger("a", c);
-
-	const bytesA = binA.toBytes();
-	const bytesB = binB.toBytes();
-	const bytesC = binC.toBytes();
-
-	t.deepEqual(bufferToArray(bytesA), expectedA);
-	t.deepEqual(bufferToArray(bytesB), expectedB);
-	t.deepEqual(bufferToArray(bytesC), expectedC);
-
-	t.end();
-});
-
 test('Int64Pos', function(t) {
-	let exception = false;
-	try {
-		new Binson().putInteger("a", 9223372036854775807);
-	} catch (err) {
-		exception = true;
-	}
-	if (!exception) {
-		throw new Error("Able to put 2^63-1 with putInteger");
-	}
+	const expected = [0x40, 0x14, 0x01, 0x61, 0x13, 0xff, 0xff,
+		  0xff, 0xff, 0xff, 0xff, 0x1f, 0x00, 0x14, 0x01, 0x62,
+		  0x13, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x1f, 0x00,
+		  0x14, 0x01, 0x63, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00,
+		  0x00, 0x20, 0x00, 0x14, 0x01, 0x64, 0x13, 0xff, 0xff,
+		  0xff, 0xff, 0xff, 0xff, 0xff, 0x7f, 0x41];
+
+	const int53Max = jsbi.BigInt(Number.MAX_SAFE_INTEGER);
+	const int53Over = jsbi.add(int53Max, jsbi.BigInt(1));
+	const int64Max = jsbi.BigInt('9223372036854775807');
+	const int64Over = jsbi.add(int64Max, jsbi.BigInt(1));
+
+	const bin =  new Binson()
+		.putInteger("a", Number.MAX_SAFE_INTEGER)
+		.putBigInt("b", int53Max)
+		.putBigInt("c", int53Over)
+		.putBigInt("d", int64Max);
+
+	t.throws(() => bin.putInteger("e", Number.MAX_SAFE_INTEGER+1));
+	t.throws(() => bin.putInteger("e", int53Over));
+	t.throws(() => bin.putInteger("e", int64Max));
+	t.throws(() => bin.putInteger("e", int64Over));
+	t.throws(() => bin.putBigInt("e", int64Over));
+
+	const bytes = bufferToArray(bin.toBytes());
+
+	t.deepEqual(bytes, expected);
 
 	t.end();
 });
 
-// Throws error! Only 32-bit integers are supported in binson.js
 test('Int64Neg', function(t) {
-	let exception = false;
-	try {
-		new Binson().putInteger("a", -9223372036854775808);
-	} catch (err) {
-		exception = true;
-	}
-	if (!exception) {
-		throw new Error("Able to put -2^63 with putInteger");
-	}
+	const expected = [0x40, 0x14, 0x01, 0x61, 0x13, 0x01, 0x00,
+		  0x00, 0x00, 0x00, 0x00, 0xe0, 0xff, 0x14, 0x01, 0x62,
+		  0x13, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe0, 0xff,
+		  0x14, 0x01, 0x63, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00,
+		  0x00, 0xe0, 0xff, 0x14, 0x01, 0x64, 0x13, 0x00, 0x00,
+		  0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x41];
+
+	const int53Min = jsbi.BigInt(Number.MIN_SAFE_INTEGER);
+	const int53Under = jsbi.subtract(int53Min, jsbi.BigInt(1));
+	const int64Min = jsbi.BigInt('-9223372036854775808');
+	const int64Under = jsbi.subtract(int64Min, jsbi.BigInt(1));
+
+	const bin =  new Binson()
+		.putInteger("a", Number.MIN_SAFE_INTEGER)
+		.putBigInt("b", int53Min)
+		.putBigInt("c", int53Under)
+		.putBigInt("d", int64Min);
+
+	t.throws(() => bin.putInteger("e", Number.MIN_SAFE_INTEGER-1));
+	t.throws(() => bin.putInteger("e", int53Under));
+	t.throws(() => bin.putInteger("e", int64Min));
+	t.throws(() => bin.putInteger("e", int64Under));
+	t.throws(() => bin.putBigInt("e", int64Under));
+
+	const bytes = bufferToArray(bin.toBytes());
+
+	t.deepEqual(bytes, expected);
 
 	t.end();
 });
@@ -593,32 +605,52 @@ test('ArrayInt32', function(t) {
 	t.end();
 });
 
-// Throws error! Binson.js cannot handle 64-bit integers
 test('ArrayInt64Pos', function(t) {
-	let exception = false;
-	try {
-		new Binson().putArray("a", [9223372036854775807]);
-	} catch (err) {
-		exception = true;
-	}
-	if (!exception) {
-		throw new Error("Able to put 64 bit integer in array");
-	}
+	const expected = [0x40, 0x14, 0x01, 0x61, 0x42, 0x13, 0xff, 0xff,
+		  0xff, 0xff, 0xff, 0xff, 0x1f, 0x00, 0x13, 0xff, 0xff, 0xff,
+		  0xff, 0xff, 0xff, 0x1f, 0x00, 0x13, 0x00, 0x00, 0x00, 0x00,
+		  0x00, 0x00, 0x20, 0x00, 0x13, 0xff, 0xff, 0xff, 0xff, 0xff,
+		  0xff, 0xff, 0x7f, 0x43, 0x41];
+
+	const int53Max = jsbi.BigInt(Number.MAX_SAFE_INTEGER);
+	const int53Over = jsbi.add(int53Max, jsbi.BigInt(1));
+	const int64Max = jsbi.BigInt('9223372036854775807');
+	const int64Over = jsbi.add(int64Max, jsbi.BigInt(1));
+
+	const bin =  new Binson()
+		.putArray("a", [Number.MAX_SAFE_INTEGER,  int53Max, int53Over, int64Max]);
+
+	t.throws(() => bin.putArray("e", [Number.MIN_SAFE_INTEGER-1]));
+	t.throws(() => bin.putArray("e", [int64Over]));
+
+	const bytes = bufferToArray(bin.toBytes());
+
+	t.deepEqual(bytes, expected);
 
 	t.end();
 });
 
-// Throws error! Binson.js cannot handle 64-bit integers
 test('ArrayInt64Neg', function(t) {
-	let exception = false;
-	try {
-		new Binson().putArray("a", [-9223372036854775807]);
-	} catch (err) {
-		exception = true;
-	}
-	if (!exception) {
-		throw new Error("Able to put 64 bit integer in array");
-	}
+	const expected = [0x40, 0x14, 0x01, 0x61, 0x42, 0x13, 0x01, 0x00,
+		  0x00, 0x00, 0x00, 0x00, 0xe0, 0xff, 0x13, 0x01, 0x00, 0x00,
+		  0x00, 0x00, 0x00, 0xe0, 0xff, 0x13, 0x00, 0x00, 0x00, 0x00,
+		  0x00, 0x00, 0xe0, 0xff, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00,
+		  0x00, 0x00, 0x80, 0x43, 0x41];
+
+	const int53Min = jsbi.BigInt(Number.MIN_SAFE_INTEGER);
+	const int53Under = jsbi.subtract(int53Min, jsbi.BigInt(1));
+	const int64Min = jsbi.BigInt('-9223372036854775808');
+	const int64Under = jsbi.subtract(int64Min, jsbi.BigInt(1));
+
+	const bin =  new Binson()
+		.putArray("a", [Number.MIN_SAFE_INTEGER, int53Min, int53Under, int64Min]);
+
+	t.throws(() => bin.putArray("e", [Number.MIN_SAFE_INTEGER-1]));
+	t.throws(() => bin.putArray("e", [int64Under]));
+
+	const bytes = bufferToArray(bin.toBytes());
+
+	t.deepEqual(bytes, expected);
 
 	t.end();
 });
